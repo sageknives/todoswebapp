@@ -1,0 +1,194 @@
+html,body,header,nav,footer,ul,li,a,img,label,section,input,textarea,button,p,h1,h2,h3,br{
+	margin:0 0;
+	padding:0 0;
+	border:0;
+}
+*:focus {
+    outline: 0;
+}
+
+a {
+	display:block;
+	color: white;
+	text-decoration:none;
+}
+
+a:hover {
+	color: gray;
+}
+
+.background {
+	background-color: rgba(0,0,0,0.1);;
+}
+#content .title{
+	padding:10px 0;
+	text-align:center;
+	width:99%;
+}
+#content section {
+	padding:20px 0 20px 0px;
+	margin-bottom:20px;
+}
+/**** Home Section ***/
+section.home-block {
+	min-height: 500px;
+	margin-bottom:10px;
+}
+section.home-block a {
+	color:black;
+}
+section.home-block a.img-link{
+	width:40%;
+	height:50%;
+	float:left;
+	margin:5% 5%;
+	
+}
+section.home-block img{
+	background-color:white;
+
+}
+section.home-block p{
+	margin:5%;
+}
+
+section.home-block ul{
+	margin:5% 5% 5% 10%;
+	list-style:decimal;
+}
+
+section.home-block form {
+	margin:5%;
+}
+section.home-block label {
+	display:block;
+	width:100%;
+	margin:0 0 2% 0;
+}
+section.home-block input {
+	width:60%;
+	height:20px;
+	float:right;
+}
+section.home-block button{
+	padding:2px;
+	float:right;
+}
+
+section.settings-block{	
+}
+section.settings-block h2{
+	padding:10px 0;
+	text-align:center;
+}
+section.settings-block label {
+	display:block;
+	width:100%;
+	margin:0 0 2% 0;
+}
+section.settings-block form {
+	width:50%;
+	margin:5% auto;
+}
+section.settings-block input {
+	width:60%;
+	height:20px;
+	float:right;
+}
+
+section.list-block h2{
+	text-align:center;
+	padding:10px 0;
+}
+section.list-block header{
+	margin-bottom:20px;
+}
+section.list-block .li-obj-l img {
+	width:90%;
+	max-height:400px;
+	margin: 0 5% 20px;
+}
+section.list-block .li-obj-r img {
+	width: 30%;
+	margin-right:3%;
+	margin-bottom:3%;
+	float:left;
+}
+section.list-block{
+	position:relative;
+}
+section.list-block h3{
+	padding:10px 0;
+}
+section.list-block footer{
+	position:absolute;
+	bottom:20px;
+	right:0;
+}
+.obj-comments p,.obj-comments textarea, .obj-comments h3 {
+	margin-left:20px;
+}
+.obj-updates{
+	position:relative;
+}
+.add-to-list{
+	float:right;
+	margin-right:5%;
+}
+.hidden {
+	display:none;
+}
+.clear {
+	clear:both;
+}
+h2.close {
+	position:absolute;
+	right:10px;
+	top:5px;
+}
+
+#spinner {
+	position:fixed;
+	margin:120px auto;
+	width:100%;
+	text-align:center;
+	z-index:10000;
+}
+
+@media all and (max-width: 768px) {
+	section.home-block {
+	min-height: 100px;
+	}
+	section.settings-block form{
+		width:90%;
+	}
+	section.settings-block input{
+		width:50%;
+	}
+	section.list-block .li-obj-r img {
+		margin-right:1%;
+		margin-left:2%;
+	}
+	section.list-block header{
+		margin-left:3%;
+	}
+	section.list-block footer{
+		position:relative;
+		bottom:0px;
+		left:2%;
+	}
+	section.list-block footer .obj-info{
+		width:40%;
+		float:left;
+	}
+	section.list-block footer .obj-action{
+		width:40%;
+		float:left;
+	}
+	.obj-log h3, .obj-log p{
+		margin-left:20px;
+	}
+	#main-footer {
+		height:50px;
+	}
+}

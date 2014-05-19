@@ -1,0 +1,1 @@
+[18-May-2014 13:55:33 America/Denver] PHP Fatal error:  Call to undefined function sortByCompleted() in /home4/sagegatz/public_html/todosajax/0700_inc/class.model_inc.php on line 115

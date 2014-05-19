@@ -1,0 +1,387 @@
+#main-header {
+	background-color:black;
+	margin:0 auto;
+	height:50px;
+	width:100%;
+	position:fixed;
+	z-index:2000;
+}
+#main-header nav{
+	height:50px;
+	width:auto;
+}
+
+#top-nav{
+	float:left;
+}
+#home-img {
+	height:35px;
+}
+#util-nav{
+	float:right;
+}
+ul.text-nav {
+	background-color:rgba(0,0,0,.8);
+	list-style:none;
+	border:1px solid black;
+}
+
+ul.text-nav li.li-title {
+	background-color:rgba(0,0,0,0.3);
+	height:26px;
+	text-align:center;
+}
+
+ul.text-nav li{
+	min-height:40px;
+	line-height:40px;
+	border-bottom:1px solid black;
+	font-size:20px;
+	color:#FAFAFA;	
+}
+ul.text-nav li:hover{
+	color:gray;
+}
+
+.top-nav-item {
+	position:relative;
+	z-index:1000;
+}
+
+/*** REPO NAV ***/
+#repo-nav{
+	position:absolute;
+	margin-left:-102px;
+	left:0;
+	top:50px;
+	width:102px;
+	background-color:black;
+	list-style:none;
+	height:100%;
+	z-index:100;
+}
+#repo-nav li ul{
+}
+#repo-nav  .image-li{
+	margin:0 0 -6px 0;
+	padding:0;
+	border:0;
+}
+#repo-nav img{
+	width:80%;
+	padding:15% 10%;
+	margin:0;
+	background:black;
+}
+#repo-nav a{
+	text-decoration:none;
+}
+
+#repo-nav ul.repo-sub {
+	position:absolute;
+	margin-left:-306px;
+	width:204px;
+	top:0px;
+	left:0px;
+	display:block;
+	z-index: -1;
+	overflow:auto;
+}
+#repo-nav ul.repo-sub li{
+	position:relative;
+	z-index: -1;
+}
+#repo-nav ul.repo-sub a {
+	color:#FAFAFA;
+}
+#repo-nav ul.repo-sub a:hover{
+	color:gray;
+}
+
+/*** TODO NAV ***/
+#todo-nav{
+	position:absolute;
+	margin-left:-345px;
+	left:0;
+	top:50px;
+	width:305px;
+	height:100%;
+	overflow:auto;	
+}
+
+
+/*** LOG NAV ***/
+#log-nav{
+	position:absolute;
+	margin-right:-391px;
+	right:0;
+	top:50px;
+	width:371px;
+	height:100%;
+	overflow:auto;
+}
+
+
+/*** SETTINGS NAV ***/
+#settings-nav{
+	position:absolute;
+	margin-right:-391px;
+	right:0;
+	top:50px;
+	width:371px;
+	height:100%;
+	overflow:auto;
+}
+#settings-button img{
+	width:80%;	
+}
+
+#login-menu {
+	position:absolute;
+	width:250px;
+	max-height:75px;
+	background-color:black;
+	top:50px;
+	right:0px;
+	margin-right:-260px;
+	z-index:20;
+	padding:5px 5px 5px;
+}
+#login-menu label{
+	display:block;
+	color:white;
+	font-size:20px;
+}
+#login-menu input{
+	width:60%;
+	font-size:16px;
+	float:right;
+}
+#login-menu button{
+	margin:0 auto;
+	color:black;
+	background-color:white;
+	padding:2px;	
+}
+
+#invalid-login {
+	float:right;
+	color:red;
+	display:none;
+}
+
+.todome {
+}
+.todolistnav {
+	list-style:decimal;
+	position:absolute;
+	top:50px;
+	left:0px;
+	width:305px;
+	margin-left:-101%;
+	height:2000px;
+}
+ul.top-element{
+}
+.todolistnav li {
+	margin:0;
+	color:white;
+	display:block;
+	font-size:20px;
+}
+.todolistnav h4 {
+	margin:0;
+	color:white;
+	display:block;
+	padding:10px;
+	background-color:rgba(0,0,0,0.3);
+	border-bottom:1px solid black;
+	font-size:25px;
+}
+.todolistnav h4 .nav-image{
+	float:right;
+	padding:0px;
+}
+.todolistnav input {
+	width:10%;
+	float:left;
+	margin:10px 0px 0px;
+}
+
+.todolistnav .nav-image{
+	width:30px;
+	min-height:30px;
+	padding:5px 0;
+	float:left;
+}
+.todolistnav .todo-nav-title{
+	padding:0px 3%;
+	min-height:40px;
+	width:74%;
+	float:left;
+}
+.todo-nav-title a{
+	min-height:40px;
+	width:100%;
+}
+.todolistnav .todo-nav-info{
+	width:10%;
+	float:left;
+}
+.todolistnav .todo-nav-info .nav-image{
+	min-height:30px;
+	width:30px;
+	padding:5px 0;
+}
+
+#add-form-container {
+	position:absolute;
+	z-index:2000;
+	width:305px;
+	top:50px;
+	margin-left:-100%;
+	background-color:rgba(0,0,0,.9);
+}
+#add-form-container h3 {
+	text-align:center;
+	color:white;
+}
+#add-form-container form{
+	margin:10px;
+	padding:10px;
+}
+#add-form-container label, #add-form-container p{
+	display:block;
+	color:white;
+	font-size:20px;
+}
+#add-form-container input{
+	width:60%;
+	font-size:16px;
+	float:right;
+}
+#add-form-container textarea{
+	width:60%;
+	font-size:16px;
+	float:right;
+}
+
+#add-form-container .browse-button {
+	margin:0 auto;
+	color:black;
+	background-color:white;
+	padding:2px;	
+}
+#add-form-container #add-button {
+	margin:0 auto;
+	color:black;
+	background-color:white;
+	padding:5px ;	
+	float:right;
+}
+#add-form-container #cancel-button {
+	margin:0 5px;
+	color:black;
+	background-color:white;
+	padding:5px;	
+	float:right;
+}
+
+#add-form-container #invalid-todo {
+	float:left;
+	color:red;
+	display:none;
+}
+/*input {
+	outline: 2px solid black;
+	margin:10px 1px;
+	-moz-appearance:none;
+	-webkit-appearance:none;
+	-o-appearance:none;
+}*/
+/*** TOP NAV LINKS ***/
+a.top-nav-link{
+	float:left;
+	color:white;
+	font-size:30px;
+	padding:10px 10px;
+}
+a.top-login-link{
+	float:left;
+	color:white;
+	font-size:30px;
+	padding:10px 10px;
+}
+a.top-nav-link:hover{
+	color:gray;
+}
+
+@media (max-width: 480px) {
+	a.top-nav-link{
+		padding-top:14px;
+		font-size:18px;
+		padding:14px 8px 10px;
+	}
+	a.top-nav-link img {
+		margin-top:-5px;
+	}
+	#repo-nav{
+		margin-left:-100%;
+	}
+	#repo-nav ul.repo-sub {
+		width:100%;
+		margin-left:-100%;
+	}
+	#todo-nav{
+	 	width:100%;
+	 	margin-left:-100%;
+	 	border:0;
+	}
+	.todolistnav{
+		width:100%;
+	 	margin-left:-101%;
+	 	border:0 transparent;
+	}
+	#add-form-container {
+		width:100%;
+	}
+	#settings-nav, #log-nav{
+		width:100%;
+		margin-right:-100%;
+		border:0;
+	}
+	.mobile #todo-button, .mobile #repo-button, .mobile #log-button {
+		position:fixed;
+		bottom:0;
+		width:33%;
+		background-color:black;
+		text-align:center;
+		padding:10px 0px;
+		margin:0;
+		font-size:24px;
+		z-index:2000;
+	}
+	
+	.mobile #todo-button {
+		left:0;
+		border-right:2px solid gray;
+	}
+	.mobile #repo-button {
+		left:33.25%;
+		border-right:2px solid gray;
+	}
+	.mobile #log-button {
+		left:66.5%;
+		padding-right:5%;
+	}
+}
+@media (max-width: 250px) {
+	a.top-nav-link{
+		padding-top:10px;
+		font-size:10px;
+	}
+	a.top-nav-link img {
+		margin-top:0px;
+		height:25px;
+	}
+}
