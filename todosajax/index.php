@@ -57,7 +57,7 @@ include 'header.php';
 <script>
 	<?php 
 	
-		echo 'alert("Session"' . $_SESSION['status'] .');'; 
+		//echo 'alert("Session"' . $_SESSION['status'] .');'; 
 		?>
 </script>
 
