@@ -56,13 +56,13 @@ class container{
 		$this->items[] = $values;
 	}
 }
-class Node
+class Node implements JsonSerializable
 {
-	private $id;
-	private $title;
-	private $parent;
-	private $isComplete;
-	private $children = array();
+	public $id;
+	public $title;
+	public $parent;
+	public $isComplete;
+	public $children = array();
 	
 	function __construct($id,$title,$parent,$isComplete)
 	{
@@ -71,7 +71,16 @@ class Node
 		$this->parent = $parent;
 		$this->isComplete = $isComplete;
 	}
-	
+	public function jsonSerialize()
+    {
+        return array(
+             'id' => $this->id,
+             'title' => $this->title,
+             'complete' => $this->isComplete,
+             'parent' => $this->parent,
+             'children' => $this->children
+        );
+    }
 	public function getId()
 	{
 		return $this->id;
@@ -101,9 +110,6 @@ class Node
 	{
 		$this->parent;
 	}
-	public function __toString() {
-        return $this->title;
-    }
 	
 	public function addChild($node)
 	{
@@ -116,7 +122,7 @@ class Node
 		return $this->children;
 	}
 	
-	private function sortByCompleted($list)
+	public function sortByCompleted($list)
 	{
 		for ($i=0; $i < count($list)-1; $i++) 
 		{
@@ -141,7 +147,7 @@ class Node
 		}
 		return $copy;
 	}
-	private function boolToNum($bool)
+	public function boolToNum($bool)
 	{
 		if($bool) return 1;
 		return 0;
@@ -150,6 +156,24 @@ class Node
 	{
 		return $this->isComplete;
 	}
+	
+	public function toArray()
+	{
+	    $data = array(
+	        'id' => $this->id,
+	        'title' => $this->title,
+	        'parent' => $this->parent,
+	        'complete' => $this->isComplete,
+	        'children' => array()
+	    );
+	
+	    foreach ($this->children as $child) {
+	        $data['children'][] = $child->toArray();
+	    }
+	
+	    return $data;
+	}
+	
 }
 
 class View

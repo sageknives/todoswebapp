@@ -2,6 +2,11 @@ var xmlhttp;
 var content;
 var d = new Date();
 var currentMenuId = '';
+var model = new Model();
+model.getHomeInstance();
+var home;
+
+//var model;
 
 if(window.XMLHttpRequest) {
 	xmlhttp = new XMLHttpRequest();
@@ -22,79 +27,7 @@ $(function() {
 		resizeNavs();
 	})
 	
-	$(".add-item").click(function(e){
-		e.stopPropagation();
-		getTodoForm($(this).attr("href"));
-		
-		//alert("add todo to list " + $(this).attr("href"));
-	});
-	$(".add-sub-item").click(function(e){
-		e.stopPropagation();
-		getTodoForm($(this).attr("href"));
-		//alert("add todo to list " + $(this).attr("href"));
-	});
-	addButtons();
-	//stops the nav from closing when ul is accidentally clicked
-	$(".todolistnav").click(function(e){
-		e.stopPropagation();
-	})
-	$(".todolistnav li").click(function(e){
-		e.stopPropagation();
-	})
-	$("#add-form-container").click(function(e){
-		e.stopPropagation();
-	})
-	$('#add-button').click(function(e) {
-		e.preventDefault();
-		addTodo($("#todo-status").val());
-		
-	});
-	$('#cancel-button').click(function(e) {
-		e.preventDefault();
-		removeTodoForm();
-		
-	});
-	$(".browse-button").click(function(e){
-		e.preventDefault();
-		alert("upload not available yet");
-	})
-	
-	$(".todo-navigation").click(function(e){
-		e.stopPropagation();
-		if($("#list-" + $(this).attr("href"))==null) return;
-		if($(this).attr("href").substr(0,1) =='x') {
-			//this is a leaf, no children,will return info on todo item to content
-			return;
-		}
-		$(this).parent().parent().animate({
-			marginLeft: "-101%",
-			height: height
-		});
-		var height = $(window).height();
-		var id = "#list-" + $(this).attr("href");
-		currentMenuId = id;
-		$(id).show();
-		$(id).animate({
-			marginLeft: "0",
-			height: height
-		});
-		
-	})
-	$('.back-navigation').click(function(e){
-		e.stopPropagation();
-		if($(this).attr("href") =='0') {
-			closeNavs();
-			return;
-		}
-		
-		$(this).parent().animate({
-			marginLeft: "-101%"
-		});
-		var id = "#list-" + $(this).attr("href");
-		$(id).animate({
-			marginLeft: "0"
-		});
-	})
+
 	//log in log out function
 	$('#login-drop').click(function(e) {
 		//e.stopPropagation();
@@ -187,6 +120,14 @@ $(function() {
 		e.stopPropagation();
 	})
 });
+
+//once todo tree has been populated it sets the variable and unsets all listeners and adds all new buttons for new content
+function populateHome(todoTree)
+{
+	home = todoTree;
+	unsetListeners();
+	addButtons();
+}
 function resizeNavs() {
 	
 	var height = $(window).height() - 50;
@@ -227,13 +168,21 @@ function closeSubNavs(element) {
 function getTodoForm(todoId){
 	var addForm = $("#add-form-container");
 		var width = $(window).width();
-		if(width > 768) width = width/2 - 150;
-		else width = '0';
+		var slideOut = 0;
+		var height = $(window).height() -50;
+		if(width > 768) {
+			slideOut = 305;
+			width = width - slideOut;
+		}
 		addForm.animate({
 			marginLeft: "0",
-			left: width
+			left: slideOut,
+			width: width,
+			height: height
 		});
 	$("#todo-status").val(todoId);
+	// this needs to populate another field so we know whether or not its this menu
+	//or a submenu, ie close parent if submenu
 	$("#todo-name").focus();
 }
 function removeTodoForm(){
@@ -274,7 +223,7 @@ function closeNavs(text) {
 }
 function addTodo(id)
 {
-	
+	//alert(home.getTitle());
 	if(id == "todo-nav") id = 0;
 	if($("#todo-name").val() == '')
 	{
@@ -284,6 +233,8 @@ function addTodo(id)
 	else{
 		$("#invalid-todo").hide();
 	}
+	var todoTitle = $("#todo-name").val();
+	var todoDesc = $("#todo-desc").val();
 	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?treeId=" + id + '&name=' + $("#todo-name").val() + '&info=' + $("#todo-desc").val();
 	$.ajax({
 		url : requestLink,
@@ -302,19 +253,77 @@ function addTodo(id)
 				return;
 			}
 			alert($("#todo-name").val() + " was successfully added");
-			
+			upDateTodoLists(id,result,todoTitle,todoDesc);
 			removeTodoForm();
 		}
 	});
 
 }
+function upDateTodoLists(parentid,id,title,desc)
+{
+	//alert(parentid);
+	ulId = "#list-" + parentid;
+	if($(ulId) != null){
+		//alert(ulId +": not null!");
+		//$(ulId).remove();
+		var todo = findTodo(parentid,home);
+		//alert((todo.getChildren()).length);
+		todo.addChild(new Todo(id,title,desc,false));
+		//alert((todo.getChildren()).length);
+		//alert(todo.getTitle());
+		
+		todo.updateList(parentid,id, todo);
+		//alert("list updated");
+		//createUl(todo,"",false);
+		//$(ulId).show();
+	} 
+	else alert(ulId +": it's null!");
+	
+	
+}
 
+function findTodo(id,todo)
+{
+	if(todo.getId() == id){
+		//alert("Id found!");
+		return todo;
+	}
+	else
+	{
+		var children = todo.getChildren();
+		for(var i=0;i<children.length;i++)
+		{
+			var maybeTodo = findTodo(id,children[i]);
+			if(maybeTodo != null) return maybeTodo;
+		}
+		return null;
+	}
+	
+}
+
+function updateTodoCompleted(isChecked){
+	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?updatetodo=" + $(this).attr("href").toLowerCase() + "&complete=" + isChecked;
+		$.ajax({
+			url : requestLink,
+			beforeSend: function(){
+                       $("#spinner").show();
+                   },
+			success : function(result) {
+				$("#spinner").hide();
+				unsetListeners();
+				$("#content").html(result);
+				addButtons();
+				//scrollToElement($('#content'));
+			}
+		});
+}
 function addButtons()
 {
 	// ajax jquery calls
 	$(".ajax-request").click(function(e) {
 		if($(window).width() < 768) closeNavs();
 		e.stopPropagation();
+		
 		var requestLink = "http://sagegatzke.com/todosajax/redirect.php?requestedinfo=" + $(this).attr("href").toLowerCase();
 		$.ajax({
 			url : requestLink,
@@ -330,9 +339,12 @@ function addButtons()
 			}
 		});
 	});
+	
+
 	$(".close").click(function(e) {
 		if($(window).width() < 768) closeNavs();
 		e.stopPropagation();
+		e.stop
 		$(this).parent().parent().slideUp();
 		
 	});
@@ -361,6 +373,89 @@ function addButtons()
 			}
 		});
 	});
+	
+	$(".add-item").click(function(e){
+		e.stopPropagation();
+		getTodoForm($(this).attr("href"));
+		
+		//alert("add todo to list " + $(this).attr("href"));
+	});
+	
+	$(".css-checkbox").change(function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		alert($(this).val() + ' todo num' + $(this).is(":checked"));
+		updateTodoCompleted($(this).is(":checked"));
+	});
+	
+	$(".add-sub-item").click(function(e){
+		e.stopPropagation();
+		getTodoForm($(this).attr("href"));
+		//alert("add todo to list " + $(this).attr("href"));
+	});
+	
+	//stops the nav from closing when ul is accidentally clicked
+	$(".todolistnav").click(function(e){
+		e.stopPropagation();
+	})
+	$(".todolistnav li").click(function(e){
+		e.stopPropagation();
+	})
+	$("#add-form-container").click(function(e){
+		e.stopPropagation();
+	})
+	$('#add-button').click(function(e) {
+		e.preventDefault();
+		addTodo($("#todo-status").val());
+		
+	});
+	$('#cancel-button').click(function(e) {
+		e.preventDefault();
+		removeTodoForm();
+		
+	});
+	$(".browse-button").click(function(e){
+		e.preventDefault();
+		alert("upload not available yet");
+	})
+	
+	$(".todo-navigation").click(function(e){
+		e.stopPropagation();
+		if($("#list-" + $(this).attr("href"))==null) return;
+		if($(this).attr("href").substr(0,1) =='x') {
+			//this is a leaf, no children,will return info on todo item to content
+			return;
+		}
+		$(this).parent().parent().animate({
+			marginLeft: "-101%",
+			height: height
+		});
+		var height = $(window).height();
+		var id = "#list-" + $(this).attr("href");
+		setMenuId(id);
+		$(id).show();
+		$(id).animate({
+			marginLeft: "0",
+			height: height
+		});
+		
+	})
+	$('.back-navigation').click(function(e){
+		e.stopPropagation();
+		if($(this).attr("href") =='0') {
+			closeNavs();
+			return;
+		}
+		
+		$(this).parent().animate({
+			marginLeft: "-101%"
+		});
+		var id = "#list-" + $(this).attr("href");
+		setMenuId(id);
+		$(id).animate({
+			marginLeft: "0"
+		});
+	})
 }
 
 
@@ -369,6 +464,17 @@ function unsetListeners()
 	$(".ajax-request").unbind('click');
 	$(".show-info").unbind('click');
 	$(".close").unbind('click');
+	$(".back-navigation").unbind('click');
+	$(".todo-navigation").unbind('click');
+	$(".browse-button").unbind('click');
+	$("#cancel-button").unbind('click');
+	$("#add-button").unbind('click');
+	$("#add-form-container").unbind('click');
+	$(".todolistnav").unbind('click');
+	$(".todolistnav li").unbind('click');
+	$(".add-sub-item").unbind('click');
+	$(".css-checkbox").unbind('click');
+	$(".add-item").unbind('click');
 }
 function scrollToElement(selector, time, verticalOffset) {
     time = typeof(time) != 'undefined' ? time : 200;
@@ -406,6 +512,12 @@ function badLogin()
 	$("#invalid-login").show();
 	$("#username").focus();
 }
+
+function setMenuId(id)
+{
+	currentMenuId = id;
+}
+
 //old ajax
 /*
 function loadContent(requestedInfo, action) {

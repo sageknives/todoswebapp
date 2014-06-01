@@ -24,8 +24,10 @@
 	else
 	{
 		$requestInfo = $_REQUEST['requestedinfo'];
-		$request = substr($requestInfo, 0,8);
-		$theTitle = substr($requestInfo, 9);
+		$requestArray = split('-',$requestInfo);
+		$request = $requestArray[0];
+		$theTitle = $requestArray[2];
+		$theId = $requestArray[1];
 		
 		if($request == 'repolist') include 'repo-list.php';
 		else if($request == 'home' || $request == '' || !$loggedIn) include 'home.php';
@@ -34,7 +36,7 @@
 		else if($request == 'todolist') include 'todo-list.php';
 		else if($request == 'repolist') include 'repo-list.php';
 		else if($request == 'comments') include 'comments.php';
-		else echo 'Error, not found';
+		else echo 'Error, not found<br>requestedInfo:'.$requestInfo.'<br>request:'.$request.'<br>theTitle:'.$theTitle.'<br>theId:'.$theId;
 	}
 	//echo '<script>alert(' .$_REQUEST['hash'] . ');';
 ?>

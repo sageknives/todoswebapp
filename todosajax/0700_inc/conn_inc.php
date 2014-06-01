@@ -39,6 +39,7 @@ function conn($access="",$improved = TRUE)
 	{//create mysqli improved connection
 		$myConn = @mysqli_connect($myHostName, $myUserName, $myPassword, $myDatabase) or die(trigger_error(mysqli_connect_error(), E_USER_ERROR));
 		$myConn->query("SET SQL_BIG_SELECTS=1");
+		$myConn->set_charset("utf-8");
 	}else{//create standard connection
 		$myConn = @mysql_connect($myHostName,$myUserName,$myPassword) or die(trigger_error(mysql_error(), E_USER_ERROR));
 		@mysql_select_db($myDatabase, $myConn) or die(trigger_error(mysql_error(), E_USER_ERROR));

@@ -69,6 +69,7 @@ function getSqlData($sql,$model)
 	return $homedir;
 }
 
+
 function createSQL($value, $depth)
 {
 	$sql ='SELECT ';
@@ -85,8 +86,96 @@ function createSQL($value, $depth)
 		$result = getSqlData($sql,$value);
 		return $result;
 }
+
+function getModelSqlData($sql,$model)
+{
+	$iConn = conn();  
+
+	$result = mysqli_query($iConn,$sql) or die(trigger_error(mysqli_error($iConn), E_USER_ERROR));
+
+	if(mysqli_num_rows($result) > 0)
+	{
+		$count = 1;
+		$wasNull = false;
+		$todos = array();
+		$todos[] = $model;
+		$model = array();
+		while($row = mysqli_fetch_assoc($result))
+		{
+		 
+			//only gets one version of each node
+			for ($i=0; $i < count($row); $i++) 
+			{ 
+				if($row['lev'.(($i%8)+1).'title'] != NULL)
+				{
+					if(count($model) == 0) $model[] = new Node($row['lev'.(($i%8)+1).'id'],$row['lev'.(($i%8)+1).'title'],$row['lev'.(($i%8)+1).'parent'],$row['lev'.(($i%8)+1).'completed']);
+					$found = false;
+					for($j=0;$j<count($todos);$j++)
+					{
+						if($todos[$j] == $row['lev'.(($i%8)+1).'id']){
+							$found = true;
+							break;
+						}
+					}
+					if(!$found)
+					{
+						 $model[] = new Node($row['lev'.(($i%8)+1).'id'],$row['lev'.(($i%8)+1).'title'],$row['lev'.(($i%8)+1).'parent'],$row['lev'.(($i%8)+1).'completed']);
+						$todos[] = $row['lev'.(($i%8)+1).'id'];	 
+					}
+				}
+			}
+			
+		}
+		//sorts nodes
+		/*for ($i=0; $i < count($model)-1; $i++) 
+		{
+			for ($j=$i+1; $j < count($model) ; $j++) 
+			{ 
+				if($model[$i]->getParent() > $model[$j]->getParent())
+				{
+					$temp = $model[$i]->getCopy();
+					$model[$i] =$model[$j]->getCopy();
+					$model[$j] = $temp->getCopy();
+				}
+			}
+		}*/
+		//$root = $model[0]->getCopy();
+		//$awesome = makeTree($model,$root);
+		//$homedir = makeTree($model,$root);
+		//testTree($awesome,'');
+		//echo '<nav class="todome"><ul id="todo-new">';
+		//createUL($awesome);
+		//echo '</ul></nav>';
+		//$homedir = new Node(1,"home",0,0);
+		//$homedir->addChild($awesome);
+		//echo '<nav class="todome">';
+		//createULS($homedir,"top-element",true);
+		//echo '</nav>';
+	}	
+	@mysqli_free_result($result);
+	return $model;
+}
+
+
+function createModelSQL($value, $depth)
+{
+	$sql ='SELECT ';
+		for ($i=0; $i <$depth ; $i++) { 
+			$sql .= 't' . ($i+1) . '.id as lev' . ($i+1) . 'id, t' . ($i+1) . '.title as lev' . ($i+1) . 'title, t' . ($i+1) . '.parent  as lev' . ($i+1) . 'parent, t' . ($i+1) . '.completed as lev' . ($i+1) . 'completed';
+			if($i < $depth-1) $sql .= ', ';
+		}
+		$sql .= ' FROM todo_list AS t1 ';
+		for ($i=0; $i <$depth -1 ; $i++) { 
+			$sql .= 'LEFT JOIN todo_list AS t' . ($i+2) . ' ON t' . ($i+2) . '.parent = t' . ($i+1) . '.id ';
+		}
+		$sql .= 'WHERE t1.id = '. $value .'';
+		
+		$result = getModelSqlData($sql,$value);
+		return $result;
+}
 function getIdFromTitle($title)
 {
+	$title = htmlentities($title);
 	$sql = 'Select tl.id from todo_list as tl where tl.title = "'.$title.'"';
 
 	$iConn = conn();  
@@ -109,6 +198,7 @@ function getIdFromTitle($title)
 
 function getListInfo($id)
 {
+	$id = htmlentities($id);
 	$sql = 'Select tl.id, tl.title, tl.parent, tl.completed,ti.desc, img.img_src from todo_list as tl 
 join todo_info as ti on tl.id = ti.todo_id 
 left join todo_img as img on tl.id = img.todo_id 
@@ -223,9 +313,10 @@ function makeComments($view)
 ';	
 return $content;
 }
-function getViewInfo($title)
+function getViewInfo($id)
 {
-	$sql = 'Select tl.id, tl.title, tl.parent, tl.completed,ti.desc, img.img_src from todo_list as tl join todo_info as ti on tl.id = ti.todo_id left join todo_img as img on tl.id = img.todo_id where tl.title = "'.$title .'"';
+	$id = htmlentities($id);
+	$sql = 'Select tl.id, tl.title, tl.parent, tl.completed,ti.desc, img.img_src from todo_list as tl join todo_info as ti on tl.id = ti.todo_id left join todo_img as img on tl.id = img.todo_id where tl.id = "'.$id .'"';
 	$iConn = conn();  
 
 	$result = mysqli_query($iConn,$sql) or die(trigger_error(mysqli_error($iConn), E_USER_ERROR));
@@ -306,9 +397,14 @@ function createULS($node,$firstelement,$firstId)
 	}
 	//echo '</li>';
 }
-function addNewTodoItemto($treeId,$title,$desc){
+function addNewTodoItemto($treeId,$title,$desc)
+{
+	$title = htmlentities($title);
+	$treeId = htmlentities($treeId);
+	$desc = htmlentities($desc);
 	
 	$sql1 = 'INSERT INTO `todo_list`(`id`, `title`, `parent`, `completed`) VALUES (null,"'.$title.'",'.$treeId.',0)';
+	$newTodoId;
 	$sql2 = 'INSERT INTO `todo_info`(`id`, `desc`, `todo_id`) VALUES (null,"'.$desc.'",LAST_INSERT_ID())';
 	$iConn = conn('insert');  
 
@@ -320,15 +416,15 @@ function addNewTodoItemto($treeId,$title,$desc){
 		  if($res === false) {
 		    throw new Exception('Wrong SQL: ' . $sql1 . ' Error: ' . $iConn->error);
 		  }
-		  
+		  $newTodoId = $iConn->insert_id;
 		  $res = $iConn->query($sql2);
-		  var_dump($res);
 		  if($res === false) {
 		    throw new Exception('Wrong SQL: ' . $sql2 . ' Error: ' . $iConn->error);
 		  }
 		 
 		  $iConn->commit();
-		  echo 'Transaction completed successfully!';
+		  //echo 'Transaction completed successfully!';
+		  echo $newTodoId;
 		 
 		} catch (Exception $e) {
 		  echo 'Transaction failed: ' . $e->getMessage();
@@ -340,7 +436,7 @@ function addNewTodoItemto($treeId,$title,$desc){
 		$iConn->autocommit(TRUE);
 	
 	@mysqli_free_result($res);
-	return true;
+	//return true;
 }
 
 function makeTree($tree,$root)
@@ -359,7 +455,7 @@ function makeTree($tree,$root)
 function checkCred($username, $password)
 {
 	$hashp = hash('haval256,4',$password);
-	
+	$username = htmlentities($username);
 	$sql = 'Select t.tree_id, u.user_name, u.user_password from user as u 
 	join todo_tree as t where t.user_id = u.user_id 
 	AND u.user_name =  "'.$username.'"';

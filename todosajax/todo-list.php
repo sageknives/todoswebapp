@@ -5,8 +5,8 @@ include '0700_inc/common_inc.php';
 include '0700_inc/conn_inc.php';
 include '0700_inc/class.model_inc.php';
 
-$id = getIdFromTitle($theTitle);
-$parent = getListInfo($id,'');
+//$id = getIdFromTitle($theTitle);
+$parent = getListInfo($theId,'');
 //$view = $parent;
 //include 'todo-view-template.php';
 //echo '<section class="col12 list-block background">';

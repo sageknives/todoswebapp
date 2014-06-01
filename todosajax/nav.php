@@ -13,13 +13,13 @@ if($loggedIn)
 	}
 	echo '
 		<a id="todo-button" class="top-nav-link">Todo</a>';
-	createULS($homedir,"top-element",true);
+	//createULS($homedir,"top-element",true);
 	echo '
 	<div id="add-form-container">
 		<h3>Add Todo</h3>
 		<form action="index.php" method="POST" id="add-form">
 			<label>Title:<input type="text" id="todo-name" name="todoname" value=""/></label>
-			<label>Description:<textarea rows="5" type="text" id="todo-desc" name="tododesc" value=""/></textarea></label>
+			<label>Description:<textarea rows="10" type="text" id="todo-desc" name="tododesc" value=""/></textarea></label>
 			<br class="clear"/>
 			<p>Add Image:</p><button id="browse-image1" class="browse-button" name="browse" value="browse">Browse</button>
 			<p>Add Image:</p><button id="browse-image2" class="browse-button" name="browse" value="browse">Browse</button>
@@ -70,27 +70,27 @@ echo '
 				<a href="#android"></a><img class="repo-icon" src="images/android.png"></a>
 				<ul class="repo-sub android text-nav">
 					<li class="li-title"><a href="">Android</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-services">Services</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-fragments">Fragments</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-activities">Activities</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-sqllite">sqllite</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-services">Services</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-services">Services</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-services">Services</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-services">Services</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-services">Services</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-services">Services</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-services">Services</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-services">Services</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-services">Services</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-services">Services</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-1-services">Services</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-2-fragments">Fragments</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-3-activities">Activities</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-4-sqllite">sqllite</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-5-services">Services</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-6-services">Services</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-7-services">Services</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-8-services">Services</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-9-services">Services</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-10-services">Services</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-11-services">Services</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-12-services">Services</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-13-services">Services</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-14-services">Services</a></li>
 				</ul>
 			</li>
 			<li class="image-li">
 				<a href="#amazon"></a><img class="repo-icon" src="images/amazon.png"></a>
 				<ul class="repo-sub amazon text-nav">
 					<li class="li-title"><a href="">Amazon</a></li>
-					<li href="repolist" class="ajax-request"><a href="#repolist-amazonec2setup">EC2 Install</a></li>
+					<li href="repolist" class="ajax-request"><a href="#repolist-15-amazonec2setup">EC2 Install</a></li>
 				</ul>
 			</li>
 			<li class="image-li">

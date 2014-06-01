@@ -256,12 +256,12 @@ ul.top-element{
 	font-size:20px;
 }
 #add-form-container input{
-	width:60%;
+	width:80%;
 	font-size:16px;
 	float:right;
 }
 #add-form-container textarea{
-	width:60%;
+	width:80%;
 	font-size:16px;
 	float:right;
 }
@@ -359,7 +359,7 @@ a.top-nav-link:hover{
 		padding:10px 0px;
 		margin:0;
 		font-size:24px;
-		z-index:2000;
+		z-index:2010;
 	}
 	
 	.mobile #todo-button {
