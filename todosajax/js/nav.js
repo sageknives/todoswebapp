@@ -301,8 +301,8 @@ function findTodo(id,todo)
 	
 }
 
-function updateTodoCompleted(isChecked){
-	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?updatetodo=" + $(this).attr("href").toLowerCase() + "&complete=" + isChecked;
+function updateTodoCompleted(id,isChecked){
+	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?treeId=" + id + "&complete=" + isChecked;
 		$.ajax({
 			url : requestLink,
 			beforeSend: function(){
@@ -310,10 +310,7 @@ function updateTodoCompleted(isChecked){
                    },
 			success : function(result) {
 				$("#spinner").hide();
-				unsetListeners();
-				$("#content").html(result);
-				addButtons();
-				//scrollToElement($('#content'));
+				//needs to update the model and redraw
 			}
 		});
 }
@@ -377,21 +374,17 @@ function addButtons()
 	$(".add-item").click(function(e){
 		e.stopPropagation();
 		getTodoForm($(this).attr("href"));
-		
-		//alert("add todo to list " + $(this).attr("href"));
 	});
 	
 	$(".css-checkbox").change(function(e) {
 		e.stopPropagation();
 		e.preventDefault();
-		alert($(this).val() + ' todo num' + $(this).is(":checked"));
-		updateTodoCompleted($(this).is(":checked"));
+		updateTodoCompleted($(this).val(),$(this).is(":checked"));
 	});
 	
 	$(".add-sub-item").click(function(e){
 		e.stopPropagation();
 		getTodoForm($(this).attr("href"));
-		//alert("add todo to list " + $(this).attr("href"));
 	});
 	
 	//stops the nav from closing when ul is accidentally clicked
@@ -489,7 +482,6 @@ function scrollToElement(selector, time, verticalOffset) {
 function updatePage()
 {
 	var pathname = ($(location).attr('hash')).substring(1);
-	//alert(($(location).attr('hash')).substring(1));
 	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?requestedinfo=" +pathname.toLowerCase();
 	$.ajax({
 		url : requestLink,
@@ -518,6 +510,17 @@ function setMenuId(id)
 	currentMenuId = id;
 }
 
+
+function findOpenNav()
+{
+	var listId ='';
+	$(".todolistnav").each(function(){
+		if($(this).css('marginLeft') == "0px"){
+			listId = $(this).attr("id");
+		}
+	})
+	return listId;
+}
 //old ajax
 /*
 function loadContent(requestedInfo, action) {

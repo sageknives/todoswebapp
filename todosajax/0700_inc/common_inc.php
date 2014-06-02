@@ -439,6 +439,33 @@ function addNewTodoItemto($treeId,$title,$desc)
 	//return true;
 }
 
+function updateTodoCompletion($treeId,$completed)
+{
+	$sql1 = 'UPDATE `todo_list` SET `completed`='.$completed.' WHERE id = ' . $treeId;
+	$iConn = conn("insert");  
+	try {
+		  /* switch autocommit status to FALSE. Actually, it starts transaction */
+		  $iConn->autocommit(FALSE);
+		 
+		  $res = $iConn->query($sql1);
+		  if($res === false) {
+		    throw new Exception('Wrong SQL: ' . $sql1 . ' Error: ' . $iConn->error);
+		  }
+		 //echo 'updated';
+		  $iConn->commit();
+		 
+		} catch (Exception $e) {
+		  echo 'Transaction failed: ' . $e->getMessage();
+		 
+		  $iConn->rollback();
+		}
+		 
+		/* switch back autocommit status */
+		$iConn->autocommit(TRUE);
+	
+	@mysqli_free_result($res);
+}
+
 function makeTree($tree,$root)
 {
 	for ($i=0; $i < count($tree) ; $i++) { 

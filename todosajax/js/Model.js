@@ -224,9 +224,7 @@ function Todo(id,title,parent,isComplete)
 	
 	this.updateList = function(id,childId,node)
 	{
-		alert("parent:" + id + ", child:" + childId);
 		var listItem = $('#list-' + id);
-		alert(listItem.length);
 		var height = listItem.css("height");
 		if(listItem.length) 
 		{
@@ -235,8 +233,12 @@ function Todo(id,title,parent,isComplete)
 
 		}
 		else{
-			alert("not created");
-			closeNavs();
+			var oldList = findOpenNav();
+			oldId = oldList.substring(5);
+			var oldListItem = $('#' + oldList);
+			oldListItem.remove();
+			var newNode = findTodo(oldId,home);
+			createUl(newNode,"",false);
 			setMenuId("#list-" + id);
 		}
 		createUl(node,"",false);

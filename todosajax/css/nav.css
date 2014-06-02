@@ -180,6 +180,10 @@ ul.text-nav li:hover{
 	width:305px;
 	margin-left:-101%;
 	height:2000px;
+	overflow:scroll;
+}
+.todolistnav li:last-child{
+	margin-bottom: 100px;
 }
 ul.top-element{
 }

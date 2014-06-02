@@ -11,15 +11,24 @@
 		include '0700_inc/conn_inc.php';
 		include '0700_inc/class.model_inc.php';
 
-		$treeId = $_REQUEST['treeId'];
-		if($treeId == 0) {
-			return -1;
+		if(isset($_REQUEST['complete']))
+		{
+			$treeId = $_REQUEST['treeId'];
+			$completed = $_REQUEST['complete'];
+			updateTodoCompletion($treeId,$completed);
 		}
-		$todoTitle = $_REQUEST['name'];
-		$todoDesc = $_REQUEST['info'];
-		
-		$isAdded = addNewTodoItemto($treeId,$todoTitle,$todoDesc);
-		return $isAdded;
+		elseif(isset($_REQUEST['name']))
+		{
+			$treeId = $_REQUEST['treeId'];
+			if($treeId == 0) {
+				return -1;
+			}
+			$todoTitle = $_REQUEST['name'];
+			$todoDesc = $_REQUEST['info'];
+			
+			$isAdded = addNewTodoItemto($treeId,$todoTitle,$todoDesc);
+			return $isAdded;
+		}
 	}
 	else
 	{
