@@ -21,7 +21,7 @@ function getSqlData($sql,$model)
 			{ 
 				if($row['lev'.(($i%8)+1).'title'] != NULL)
 				{
-					if(count($model) == 0) $model[] = new Node($row['lev'.(($i%8)+1).'id'],$row['lev'.(($i%8)+1).'title'],$row['lev'.(($i%8)+1).'parent'],$row['lev'.(($i%8)+1).'completed']);
+					if(count($model) == 0) $model[] = new Node($row['lev'.(($i%8)+1).'id'],$row['lev'.(($i%8)+1).'title'],$row['lev'.(($i%8)+1).'parent'],$row['lev'.(($i%8)+1).'completed'],$row['lev'.(($i%8)+1).'duedate'],$row['lev'.(($i%8)+1).'lastupdated']);
 					$found = false;
 					for($j=0;$j<count($todos);$j++)
 					{
@@ -32,7 +32,7 @@ function getSqlData($sql,$model)
 					}
 					if(!$found)
 					{
-						 $model[] = new Node($row['lev'.(($i%8)+1).'id'],$row['lev'.(($i%8)+1).'title'],$row['lev'.(($i%8)+1).'parent'],$row['lev'.(($i%8)+1).'completed']);
+						 $model[] = new Node($row['lev'.(($i%8)+1).'id'],$row['lev'.(($i%8)+1).'title'],$row['lev'.(($i%8)+1).'parent'],$row['lev'.(($i%8)+1).'completed'],$row['lev'.(($i%8)+1).'duedate'],$row['lev'.(($i%8)+1).'lastupdated']);
 						$todos[] = $row['lev'.(($i%8)+1).'id'];	 
 					}
 				}
@@ -74,7 +74,10 @@ function createSQL($value, $depth)
 {
 	$sql ='SELECT ';
 		for ($i=0; $i <$depth ; $i++) { 
-			$sql .= 't' . ($i+1) . '.id as lev' . ($i+1) . 'id, t' . ($i+1) . '.title as lev' . ($i+1) . 'title, t' . ($i+1) . '.parent  as lev' . ($i+1) . 'parent, t' . ($i+1) . '.completed as lev' . ($i+1) . 'completed';
+			$sql .= 't' . ($i+1) . '.id as lev' . ($i+1) . 'id, t' . ($i+1) . '.title as lev' . ($i+1) . 'title, t' 
+			. ($i+1) . '.parent  as lev' . ($i+1) . 'parent, t' . ($i+1) . '.completed as lev' . ($i+1) . 'completed, t' 
+			. ($i+1) . '.due_date as lev' . ($i+1) . 'duedate, t' 
+			. ($i+1) . '.last_updated as lev' . ($i+1) . 'lastupdated';
 			if($i < $depth-1) $sql .= ', ';
 		}
 		$sql .= ' FROM todo_list AS t1 ';
@@ -108,7 +111,7 @@ function getModelSqlData($sql,$model)
 			{ 
 				if($row['lev'.(($i%8)+1).'title'] != NULL)
 				{
-					if(count($model) == 0) $model[] = new Node($row['lev'.(($i%8)+1).'id'],$row['lev'.(($i%8)+1).'title'],$row['lev'.(($i%8)+1).'parent'],$row['lev'.(($i%8)+1).'completed']);
+					if(count($model) == 0) $model[] = new Node($row['lev'.(($i%8)+1).'id'],$row['lev'.(($i%8)+1).'title'],$row['lev'.(($i%8)+1).'parent'],$row['lev'.(($i%8)+1).'completed'],$row['lev'.(($i%8)+1).'duedate'],$row['lev'.(($i%8)+1).'lastupdated']);
 					$found = false;
 					for($j=0;$j<count($todos);$j++)
 					{
@@ -119,7 +122,7 @@ function getModelSqlData($sql,$model)
 					}
 					if(!$found)
 					{
-						 $model[] = new Node($row['lev'.(($i%8)+1).'id'],$row['lev'.(($i%8)+1).'title'],$row['lev'.(($i%8)+1).'parent'],$row['lev'.(($i%8)+1).'completed']);
+						 $model[] = new Node($row['lev'.(($i%8)+1).'id'],$row['lev'.(($i%8)+1).'title'],$row['lev'.(($i%8)+1).'parent'],$row['lev'.(($i%8)+1).'completed'],$row['lev'.(($i%8)+1).'duedate'],$row['lev'.(($i%8)+1).'lastupdated']);
 						$todos[] = $row['lev'.(($i%8)+1).'id'];	 
 					}
 				}
@@ -161,7 +164,12 @@ function createModelSQL($value, $depth)
 {
 	$sql ='SELECT ';
 		for ($i=0; $i <$depth ; $i++) { 
-			$sql .= 't' . ($i+1) . '.id as lev' . ($i+1) . 'id, t' . ($i+1) . '.title as lev' . ($i+1) . 'title, t' . ($i+1) . '.parent  as lev' . ($i+1) . 'parent, t' . ($i+1) . '.completed as lev' . ($i+1) . 'completed';
+			$sql .= 't' . ($i+1) . '.id as lev' . ($i+1) . 'id, t' . 
+			($i+1) . '.title as lev' . ($i+1) . 'title, t' . ($i+1) . 
+			'.parent  as lev' . ($i+1) . 'parent, t' . ($i+1) . 
+			'.completed as lev' . ($i+1) . 'completed, t' . ($i+1) . 
+			'.dueDate as lev' . ($i+1) . 'duedate, t' . ($i+1) . 
+			'.lastUpdated as lev' . ($i+1) . 'lastupdated';
 			if($i < $depth-1) $sql .= ', ';
 		}
 		$sql .= ' FROM todo_list AS t1 ';
@@ -313,10 +321,11 @@ function makeComments($view)
 ';	
 return $content;
 }
+
 function getViewInfo($id)
 {
 	$id = htmlentities($id);
-	$sql = 'Select tl.id, tl.title, tl.parent, tl.completed,ti.desc, img.img_src from todo_list as tl join todo_info as ti on tl.id = ti.todo_id left join todo_img as img on tl.id = img.todo_id where tl.id = "'.$id .'"';
+	$sql = 'Select tl.id, tl.title, tl.parent, tl.completed,tl.due_date,tl.last_updated,ti.desc, img.img_src from todo_list as tl join todo_info as ti on tl.id = ti.todo_id left join todo_img as img on tl.id = img.todo_id where tl.id = "'.$id .'"';
 	$iConn = conn();  
 
 	$result = mysqli_query($iConn,$sql) or die(trigger_error(mysqli_error($iConn), E_USER_ERROR));
@@ -327,7 +336,7 @@ function getViewInfo($id)
 		while($row = mysqli_fetch_assoc($result))
 		{
 			if($count == 0){
-				$view = new View($row['id'],$row['title'],$row['parent'],$row['completed'],$row['desc']);
+				$view = new View($row['id'],$row['title'],$row['parent'],$row['completed'],$row['desc'],$row['due_date'],$row['last_updated']);
 			}
 			if($row['img_src'] != null) $view->addImage($row['img_src']);
 			
@@ -336,6 +345,32 @@ function getViewInfo($id)
 	}
 	@mysqli_free_result($result);
 	return $view;
+}
+
+function getViewInfo2($id)
+{
+	$id = htmlentities($id);
+	$sql = 'Select tl.id, tl.title, tl.parent, tl.completed,tl.due_date,tl.last_updated,ti.desc,ti.created_by,ti.assigned_to,img.img_src from todo_list as tl join todo_info as ti on tl.id = ti.todo_id left join todo_img as img on tl.id = img.todo_id where tl.id = "'.$id .'"';
+	$iConn = conn();  
+
+	$result = mysqli_query($iConn,$sql) or die(trigger_error(mysqli_error($iConn), E_USER_ERROR));
+	$node = null;
+	if(mysqli_num_rows($result) > 0)
+	{
+		$count = 0;
+		while($row = mysqli_fetch_assoc($result))
+		{
+			if($count == 0){
+				$node = new Node($row['id'],$row['title'],$row['parent'],$row['completed'],$row['due_date'],$row['last_updated']);
+				$node->fullConstruct($row['desc'],$row['created_by'],$row['assigned_to']);
+			}
+			if($row['img_src'] != null) $node->addImage($row['img_src']);
+			
+			$count++;
+		}
+	}
+	@mysqli_free_result($result);
+	return $node;
 }
 function createULS($node,$firstelement,$firstId)
 {
@@ -397,15 +432,19 @@ function createULS($node,$firstelement,$firstId)
 	}
 	//echo '</li>';
 }
-function addNewTodoItemto($treeId,$title,$desc)
+
+/**
+ * adds new todo item to db
+ */
+function addNewTodoItemto($treeId,$title,$desc,$dueDate,$lastUpdated)
 {
 	$title = htmlentities($title);
 	$treeId = htmlentities($treeId);
 	$desc = htmlentities($desc);
 	
-	$sql1 = 'INSERT INTO `todo_list`(`id`, `title`, `parent`, `completed`) VALUES (null,"'.$title.'",'.$treeId.',0)';
+	$sql1 = 'INSERT INTO `todo_list`(`id`, `title`, `parent`, `completed`, `due_date`, `last_updated`) VALUES (null,"'.$title.'",'.$treeId.',0,"'.$dueDate .'",Now()])';
 	$newTodoId;
-	$sql2 = 'INSERT INTO `todo_info`(`id`, `desc`, `todo_id`) VALUES (null,"'.$desc.'",LAST_INSERT_ID())';
+	$sql2 = 'INSERT INTO `todo_info`(`id`, `desc`, `todo_id`, `created_by`, `assigned_to`) VALUES (null,"'.$desc.'",LAST_INSERT_ID(),1,0)';
 	$iConn = conn('insert');  
 
 	try {
@@ -439,9 +478,12 @@ function addNewTodoItemto($treeId,$title,$desc)
 	//return true;
 }
 
+/**
+ * updates database with completed or uncompleted
+ */
 function updateTodoCompletion($treeId,$completed)
 {
-	$sql1 = 'UPDATE `todo_list` SET `completed`='.$completed.' WHERE id = ' . $treeId;
+	$sql1 = 'UPDATE `todo_list` SET `completed`='.$completed.', `last_updated`=Now() WHERE id = ' . $treeId;
 	$iConn = conn("insert");  
 	try {
 		  /* switch autocommit status to FALSE. Actually, it starts transaction */
@@ -466,6 +508,7 @@ function updateTodoCompletion($treeId,$completed)
 	@mysqli_free_result($res);
 }
 
+
 function makeTree($tree,$root)
 {
 	for ($i=0; $i < count($tree) ; $i++) { 
@@ -479,6 +522,9 @@ function makeTree($tree,$root)
 	
 }
 
+/**
+ * Checks log in 
+ */
 function checkCred($username, $password)
 {
 	$hashp = hash('haval256,4',$password);
@@ -506,6 +552,14 @@ function checkCred($username, $password)
 	return null;
 }
 
+function checkForUpdate($id,$lastUpdate)
+{
+	return 0;
+}
+ 
+/**
+ * starts a session
+ */
 function startSession()
 {
 	if(isset($_SESSION)) return true;

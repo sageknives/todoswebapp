@@ -62,14 +62,29 @@ class Node implements JsonSerializable
 	public $title;
 	public $parent;
 	public $isComplete;
+	public $dueDate;
+	public $lastUpdated;
+	public $desc;
+	public $createdBy;
+	public $assignedTo;
+	private $images = array();
 	public $children = array();
 	
-	function __construct($id,$title,$parent,$isComplete)
+	function __construct($id,$title,$parent,$isComplete,$dueDate,$lastUpdated/*,$desc,$createdBy*/)
 	{
 		$this->id = $id;
 		$this->title = $title;
 		$this->parent = $parent;
 		$this->isComplete = $isComplete;
+		$this->dueDate = $dueDate;
+		$this->lastUpdated = $lastUpdated;
+		$this->images = array();
+	}
+	function fullConstruct($desc,$createdBy,$assignedTo)
+	{
+		$this->desc = $desc;
+		$this->createdBy = $createdBy;
+		$this->assignedTo = $assignedTo;
 	}
 	public function jsonSerialize()
     {
@@ -78,6 +93,11 @@ class Node implements JsonSerializable
              'title' => $this->title,
              'complete' => $this->isComplete,
              'parent' => $this->parent,
+             'duedate' => $this->dueDate,
+             'lastupdated' => $this->lastUpdated,
+             'desc' => $this->desc,
+             'createdby' => $this->createdBy,
+             'images' => $this->images,
              'children' => $this->children
         );
     }
@@ -96,6 +116,23 @@ class Node implements JsonSerializable
 		return $this->parent;
 	}
 	
+	public function getDueDate()
+	{
+		return $this->dueDate;
+	}
+	public function getLastUpdated()
+	{
+		return $this->lastUpdated;
+	}
+	public function getDesc()
+	{
+		return $this->desc;
+	}
+	public function getCreatedBy()
+	{
+		return $this->createdBy;
+	}
+	
 	function setId($id)
 	{
 		$this->id;
@@ -111,6 +148,11 @@ class Node implements JsonSerializable
 		$this->parent;
 	}
 	
+	function setDueDate($dueDate)
+	{
+		$this->dueDate;
+	}
+	
 	public function addChild($node)
 	{
 		$this->children[] = $node;
@@ -120,6 +162,16 @@ class Node implements JsonSerializable
 	{
 		$this->children = $this->sortByCompleted($this->children);
 		return $this->children;
+	}
+	
+	public function addImage($image)
+	{
+		$this->images[] = $image;
+	}
+	
+	public function getImages()
+	{
+		return $this->images;
 	}
 	
 	public function sortByCompleted($list)
@@ -140,7 +192,7 @@ class Node implements JsonSerializable
 	}
 	public function getCopy()
 	{
-		$copy =new Node($this->id,$this->title,$this->parent,$this->isComplete);
+		$copy =new Node($this->id,$this->title,$this->parent,$this->isComplete,$this->dueDate,$this->lastUpdated);
 		$children = $this->getChildren();
 		for ($i=0; $i < count($children) ; $i++) { 
 			$copy->addChild($children[$i]->getCopy());
@@ -164,11 +216,19 @@ class Node implements JsonSerializable
 	        'title' => $this->title,
 	        'parent' => $this->parent,
 	        'complete' => $this->isComplete,
+	        'duedate' => $this->dueDate,
+	        'lastupdated' => $this->lastUpdated,
+            'desc' => $this->desc,
+            'createdby' => $this->createdBy,
+	        'images' => array(),
 	        'children' => array()
 	    );
 	
 	    foreach ($this->children as $child) {
 	        $data['children'][] = $child->toArray();
+	    }
+		foreach ($this->images as $child) {
+	        $data['images'][] = $child;
 	    }
 	
 	    return $data;
@@ -183,16 +243,18 @@ class View
 	private $parent;
 	private $completed;
 	private $desc;
+	private $dueDate;
 	private $images = array();
 	private $children = array();
 	
-	function __construct($id,$title,$parent,$completed,$desc)
+	function __construct($id,$title,$parent,$completed,$desc,$dueDate)
 	{
 		$this->id = $id;
 		$this->title = $title;
 		$this->parent = $parent;
 		$this->completed = $completed;
 		$this->desc = $desc;
+		$this->dueDate = $dueDate;
 	}
 	
 	public function getId()
@@ -218,6 +280,11 @@ class View
 	public function getDesc()
 	{
 		return $this->desc;
+	}
+	
+	public function getDueDate()
+	{
+		return $this->dueDate;
 	}
 	
 	public function addImage($image)

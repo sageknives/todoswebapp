@@ -7,7 +7,7 @@ echo '
 		<a id="home-button" href="#home" class="top-nav-link"><img id="home-img" href="home" class="ajax-request" src="images/home.png"></a>';
 if($loggedIn)
 {
-	$homedir = new Node(1,"home",0,0);
+	$homedir = new Node(1,"home",0,0,"00-00-0000","00-00-0000");
 	for ($i=0; $i < count($treeId); $i++) { 
 		$homedir->addChild(createSQL($treeId[$i],8));
 	}
@@ -20,6 +20,7 @@ if($loggedIn)
 		<form action="index.php" method="POST" id="add-form">
 			<label>Title:<input type="text" id="todo-name" name="todoname" value=""/></label>
 			<label>Description:<textarea rows="10" type="text" id="todo-desc" name="tododesc" value=""/></textarea></label>
+			<label>Due Date:<input type="text" id="todo-date" name="tododate" value=""/></label>
 			<br class="clear"/>
 			<p>Add Image:</p><button id="browse-image1" class="browse-button" name="browse" value="browse">Browse</button>
 			<p>Add Image:</p><button id="browse-image2" class="browse-button" name="browse" value="browse">Browse</button>

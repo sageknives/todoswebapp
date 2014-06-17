@@ -15,6 +15,7 @@
 <link type="text/css" rel="stylesheet" href="css/styles.css"/>
 <link type="text/css" rel="stylesheet" href="css/onepcssgrid.css"/>
 <link type="text/css" rel="stylesheet" href="css/nav.css"/>
+<link href="css/dark-hive/jquery-ui-1.10.4.custom.min.css" rel="stylesheet">
 <!--js files-->
 <script src="js/jquery-1.11.0.min.js"></script>
 <script src="js/jquery-ui-1.10.4.custom.min.js"></script>
@@ -28,8 +29,7 @@ $(function() {
 //var noRequest = false;
 if(<?php echo $noRequest; ?>== 1) 
 {
-	
-		updatePage();
+	updatePage();
 }
 else if(<?php echo $noRequest; ?>== 2)
 {

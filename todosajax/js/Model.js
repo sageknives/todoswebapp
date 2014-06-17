@@ -1,3 +1,6 @@
+/**
+ * Webapp overall Model
+ */
 function Model()
 {
 	this.home;
@@ -6,7 +9,6 @@ function Model()
 	{
 		return this.home;
 	}
-	
 	this.setHome = function(node)
 	{
 		this.home = node;
@@ -14,9 +16,15 @@ function Model()
 	}
 	this.getHomeInstance = function()
 	{
-		if(this.home == null)
+		if(this.home == null) this.getTree();
+	};
+	this.updateTree = function(todo)
+	{
+		var children = todo.getChildren();
+		for(var i=0;i<children.length;i++)
 		{
-			this.getTree();
+			children[i].getExtraInfo();
+			this.updateTree(children[i])
 		}
 	};
 	
@@ -34,69 +42,303 @@ function Model()
 			},
 			success : function(result) {
 				//$("#spinner").hide();
-				//unsetListeners();
-				
-				
-				var stringify = JSON.stringify(result);
+				//var stringify = JSON.stringify(result);
 				var todoTree = createTree(result);
-				//$("#content").html(stringify);
-				//var titles = [];
-				//var indent = '';
-				//titles = testTree(result,titles,indent);
-				//var content = '';
-				//for(var i=0;i< titles.length;i++)
-				//{
-				//  content += titles[i] + '<br>';
-				//}
-				//alert(todoTree.isCompleted());
+
 				createULS(todoTree,"top-element",true);
-				//this.home = todoTree;
-				model.setHome(todoTree);
-				
-				
+				model.setHome(todoTree);	
 			}
 		});
 	};
 }
 
-function testTree(item,titles,indent)
+
+/**
+ * Todo Class
+ */
+function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
 {
-	//if(item.title === undefined) return;
-	titles.push(indent + item.title);
-	for(var i = 0; i < (item.children).length;i++)
+	this.id = id;
+	this.title = title;
+	this.parent = parent;
+	this.isComplete = isComplete;
+	this.dueDate = dueDate;
+	this.lastUpdated = lastUpdated;
+	this.desc;
+	this.assignedTo;
+	this.createdBy;
+	this.images = [];
+	this.children = [];
+	
+	this.getId = function()
 	{
-		//titles += item.children[i].title + '<br>';
-		//if((item.children[i]).length == 0) continue;
-		testTree(item.children[i],titles,indent + '&nbsp;&nbsp;&nbsp;&nbsp;');
+		return this.id;
+	};
+	this.getTitle = function()
+	{
+		return this.title;
+	};
+	this.getParent = function()
+	{
+		return this.parent;
+	};
+	this.isCompleted = function()
+	{
+		return this.isComplete == 1;
+	};
+	this.getDueDate = function()
+	{
+		return this.dueDate;
+	};
+	this.getLastUpdated = function()
+	{
+		return this.lastUpdated;
+	};
+	this.getDesc = function()
+	{
+		return this.desc;
+	};
+	this.addImage = function(src)
+	{
+		this.images.push(src);
+	};
+	this.getImages = function()
+	{
+		return this.images;
 	}
-	return titles;
+	this.addChild = function(todo)
+	{
+		this.children.push(todo);
+	};
+	this.getChildren = function()
+	{
+		var count = (this.children).length;
+		if(count > 1)
+		{
+			 this.children = this.sortByDueDate(this.children);
+			 this.children = this.sortByCompleted(this.children);
+		}
+		return this.children;
+	};
+	
+	this.sortByCompleted = function(list)
+	{
+		for ( var i=0; i < list.length; i++) 
+		{
+			for (var j=i+1; j < list.length; j++) 
+			{ 
+				if(list[j].title == null) continue;
+				if(this.boolToNum(list[i].isCompleted()) > this.boolToNum(list[j].isCompleted()))
+				{
+					var temp = list[i];
+					list[i] = list[j];
+					list[j] = temp;				
+				}
+			}
+		}	
+		return list;
+	};
+	
+	this.sortByDueDate = function(list)
+	{
+		for ( var i=0; i < list.length; i++) 
+		{
+			for (var j=i+1; j < list.length; j++) 
+			{ 
+				if(list[j].title == null) continue;
+				
+				if(list[i].getDueDate() < list[j].getDueDate())
+				{
+					var temp = list[i];
+					list[i] = list[j];
+					list[j] = temp;				
+				}
+			}
+		}	
+		return list;
+	};
+	
+	this.boolToNum = function(isTrue)
+	{
+		if(isTrue) return 1;
+		return 0;
+	};
+	
+	this.getExtraInfo = function()
+	{
+		var curTodo = this;
+		
+		var requestLink = "http://sagegatzke.com/todosajax/jsdirect.php?jsrequest=getextra&todoid=" + curTodo.id;
+		$.ajax({
+			url : requestLink,
+			dataType : "json",
+			async:true,
+			contentType: "application/json",
+			beforeSend : function() {
+				//$("#spinner").show();
+			},
+			success : function(result) {
+				if(result == null)return;
+				//alert(curTodo.id);
+				curTodo.desc = result.desc;
+				curTodo.createdBy = result.createdby;
+				curTodo.assignedTo = result.assignedto;
+				var imgs = result.images;
+				for(var i=0;i< imgs.length; i++){
+				  	curTodo.addImage(imgs[i]);
+				};
+				//curTodo.images = result.images;
+				//alert(curTodo.desc);
+				//$("#spinner").hide();
+				//var stringify = JSON.stringify(result);
+				//alert(stringify);
+				//var todoTree = createTree(result);
+
+				//createULS(todoTree,"top-element",true);
+				//model.setHome(todoTree);	
+			}
+		});
+	};
+	
+	this.checkForUpdate = function()
+	{
+		var curTodo = this;
+		alert(curTodo.id);
+		var requestLink = "http://sagegatzke.com/todosajax/jsdirect.php?jsrequest=checkforupdate&todoid=" + curTodo.id+"&todolast="+curTodo.lastUpdated;
+		$.ajax({
+			url : requestLink,
+			dataType : "json",
+			async:true,
+			contentType: "application/json",
+			beforeSend : function() {
+				//$("#spinner").show();
+			},
+			success : function(result) {
+				if(result == null)return;
+				//$("#spinner").hide();
+				//var stringify = JSON.stringify(result);
+				//var todoTree = createTree(result);
+				
+				//createULS(todoTree,"top-element",true);
+				//model.setHome(todoTree);	
+			}
+		});
+	};
+	
+	this.updateList = function(id,childId,node)
+	{
+		var listItem = $('#list-' + id);
+		var height = listItem.css("height");
+		if(listItem.length) 
+		{
+			listItem.remove();
+		}
+		else{
+			var oldList = findOpenNav();
+			oldId = oldList.substring(5);
+			var oldListItem = $('#' + oldList);
+			oldListItem.remove();
+			var newNode = findTodo(oldId,home);
+			createUl(newNode,"",false);
+			setMenuId("#list-" + id);
+		}
+		createUl(node,"",false);
+		listItem = $("#list-" + id);
+		$(listItem).show();
+		$(listItem).css("margin-left" ,"0");
+		$(listItem).css("height", height);
+		unsetListeners();
+		addButtons();
+	}
+
+	//this.setDesc = function()
 }
+
+/**
+ * Creates a list of views
+ */
+function makeList(todo, stepNum)
+{
+	var content = makeView(todo,'');
+	var children = todo.getChildren();
+	
+	for (var i=0; i < children.length ; i++) { 
+		content += makeView(children[i],(i+1));
+	}
+	return content;
+}
+/**
+ * creates a view
+ */
+function makeView(todo, stepNum)
+{
+	var contentView = '';
+	var checked = '';
+	if(todo != null && todo.isCompleted()) checked = "checked";
+
+	contentView += '<div id="view-' + todo.getId() +'"><h2 class="title">'+
+	stepNum+todo.getTitle()+'</h2><section class="col12 list-block background"><div class="li-obj">';
+
+ 	var images = todo.getImages();
+	if(images.length > 0)
+	{
+		contentView += '<div class="li-obj-l col7"><img class="main-img" src="'+images[0]+'" /></div>';
+	}		
+	contentView +=	'<div class="li-obj-r col5"><header>';
+	if(images.length > 1)
+	{
+		for (var i=0; i < images.length; i++) { 
+			contentView += '<img src="'+images[i]+'" />';
+		}
+		contentView += '<br class="clear"/>';
+	}
+	contentView +=	'<p>'+todo.getDesc()+'</p></header></div><footer class="col5"><div class="obj-info col8">'+
+		'<p>5 of 7</p><p>Complete</p></div><div class="obj-action col3"><label><input type="checkbox" '+
+		checked+'>Mark As Done</label><p class="show-info" href="comments" id="'+stepNum+'">Comments/WorkLog</p></div>'+
+			'</footer><br class="clear"/></div></section><div id="count'+stepNum+'">';
+	//contentView += makeComments(todo);
+	contentView += '</div></div><br class="clear">';
+	return contentView;		
+}
+
+/**
+ * creates comment section
+ */
+function makeComments(todo)
+{
+	var content = '<section class="obj-updates col12 background"><div class="obj-comments col7"><h3>Comments:</h3>'+
+		'<p>4/16/2014</p><p>Tim</p><p>I think we should change the title of this to Sub subtitle?</p>'+
+		'<textarea rows="4"></textarea></div><div class="obj-log col5"><h3>Notifications:</h3>'+
+		'<h2 class="close">X</h2><p>SubTask1 finished by Tim on 4/14/2014</p></div></section>';	
+	return content;
+}
+
+/**
+ * creates the todo tree based on an ajax json response
+ */
 function createTree(json)
 {
-	var item = new Todo(json.id,json.title,json.parent,json.complete);
-	
-	for(var i = 0; i < (json.children).length;i++)
-	{
-		item.addChild(createTree(json.children[i]));
-	}
+	var item = new Todo(json.id,json.title,json.parent,json.complete,json.duedate,json.lastupdated);
+	for(var i = 0; i < (json.children).length;i++) item.addChild(createTree(json.children[i]));
 	return item;
 }
 
+/**
+ * creates all Todo lists in model
+ */
 function createULS(node,firstelement,firstId)
 {
-	
-	
 	if(node.getChildren().length> 0)
 	{
 		var children = createUl(node,firstelement,firstId);
-		for (var i=0; i < children.length; i++) { 
-			createULS(children[i],firstelement,'');
-		}
-		
+		for (var i=0; i < children.length; i++)createULS(children[i],firstelement,'');		
 	}
-	//echo '</li>';
 }
 
+
+/**
+ * Creates a ul from a todo and its children
+ */
 function createUl(node,firstelement,firstId)
 {
 	var children = node.getChildren();
@@ -149,107 +391,18 @@ function createUl(node,firstelement,firstId)
 	return children;
 }
 
-function createLi()
+/**
+ * Tests tree
+ * @param {Object} item
+ * @param {Object} titles
+ * @param {Object} indent
+ */
+function testTree(item,titles,indent)
 {
-	
-}
-
-function Todo(id,title,parent,isComplete)
-{
-	this.id = id;
-	this.title = title;
-	this.parent = parent;
-	this.isComplete = isComplete;
-	this.children = [];
-	/*function(){
-		var arr = [];
-		for(var child in children)
-		{
-			arr = new Todo(child.id,child.title,child.parent,child.complete,child.children);
-		}
-		return arr;
-	};*/
-	
-	this.getId = function()
+	titles.push(indent + item.title);
+	for(var i = 0; i < (item.children).length;i++)
 	{
-		return this.id;
-	};
-	this.getTitle = function()
-	{
-		return this.title;
-	};
-	this.getParent = function()
-	{
-		return this.parent;
-	};
-	this.isCompleted = function()
-	{
-		return this.isComplete == 1;
-	};
-	this.addChild = function(todo)
-	{
-		this.children.push(todo);
-	};
-	this.getChildren = function()
-	{
-		var count = (this.children).length;
-		//alert("Children count = " + count);
-		if(count > 1) this.children = this.sortByCompleted(this.children);
-		return this.children;
-	};
-	
-	this.sortByCompleted = function(list)
-	{
-		for ( var i=0; i < list.length; i++) 
-		{
-			for (var j=i+1; j < list.length; j++) 
-			{ 
-				if(list[j].title == null) continue;
-				if(this.boolToNum(list[i].isCompleted()) > this.boolToNum(list[j].isCompleted()))
-				{
-					var temp = list[i];
-					list[i] = list[j];
-					list[j] = temp;				
-				}
-			}
-		}	
-		return list;
-	};
-	
-	this.boolToNum = function(isTrue)
-	{
-		if(isTrue) return 1;
-		return 0;
-	};
-	
-	this.updateList = function(id,childId,node)
-	{
-		var listItem = $('#list-' + id);
-		var height = listItem.css("height");
-		if(listItem.length) 
-		{
-			listItem.remove();
-			
-
-		}
-		else{
-			var oldList = findOpenNav();
-			oldId = oldList.substring(5);
-			var oldListItem = $('#' + oldList);
-			oldListItem.remove();
-			var newNode = findTodo(oldId,home);
-			createUl(newNode,"",false);
-			setMenuId("#list-" + id);
-		}
-		createUl(node,"",false);
-		listItem = $("#list-" + id);
-		$(listItem).show();
-		$(listItem).css("margin-left" ,"0");
-		$(listItem).css("height", height);
-		unsetListeners();
-		addButtons();
+		testTree(item.children[i],titles,indent + '&nbsp;&nbsp;&nbsp;&nbsp;');
 	}
+	return titles;
 }
-
-
-

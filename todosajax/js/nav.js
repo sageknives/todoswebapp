@@ -21,13 +21,14 @@ $(function() {
 	
 	})
 	$(window).on('popstate', function() {
-      updatePage();
+      //updatePage();
+      updatePageWithModel();
     });
 	$(window).resize(function() {
 		resizeNavs();
 	})
 	
-
+	$( "#todo-date" ).datepicker({dateFormat: 'yy-mm-dd'});
 	//log in log out function
 	$('#login-drop').click(function(e) {
 		//e.stopPropagation();
@@ -127,6 +128,7 @@ function populateHome(todoTree)
 	home = todoTree;
 	unsetListeners();
 	addButtons();
+	model.updateTree(home);
 }
 function resizeNavs() {
 	
@@ -235,7 +237,10 @@ function addTodo(id)
 	}
 	var todoTitle = $("#todo-name").val();
 	var todoDesc = $("#todo-desc").val();
-	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?treeId=" + id + '&name=' + $("#todo-name").val() + '&info=' + $("#todo-desc").val();
+	var dueDate = $("#todo-date").val() + " 12:00:00";
+	alert(dueDate);
+	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?treeId=" + id + 
+	'&name=' + $("#todo-name").val() + '&info=' + $("#todo-desc").val() +  '&date=' + dueDate;
 	$.ajax({
 		url : requestLink,
 		beforeSend: function(){
@@ -253,13 +258,13 @@ function addTodo(id)
 				return;
 			}
 			alert($("#todo-name").val() + " was successfully added");
-			upDateTodoLists(id,result,todoTitle,todoDesc);
+			upDateTodoLists(id,result,todoTitle,todoDesc,dueDate);
 			removeTodoForm();
 		}
 	});
 
 }
-function upDateTodoLists(parentid,id,title,desc)
+function upDateTodoLists(parentid,id,title,desc,dueDate)
 {
 	//alert(parentid);
 	ulId = "#list-" + parentid;
@@ -268,7 +273,7 @@ function upDateTodoLists(parentid,id,title,desc)
 		//$(ulId).remove();
 		var todo = findTodo(parentid,home);
 		//alert((todo.getChildren()).length);
-		todo.addChild(new Todo(id,title,desc,false));
+		todo.addChild(new Todo(id,title,desc,false,dueDate));
 		//alert((todo.getChildren()).length);
 		//alert(todo.getTitle());
 		
@@ -345,6 +350,7 @@ function addButtons()
 		$(this).parent().parent().slideUp();
 		
 	});
+	
 	$(".show-info").click(function(e) {
 		if($(window).width() < 768) closeNavs();
 		e.stopPropagation();
@@ -359,13 +365,13 @@ function addButtons()
 			success : function(result) {
 				$("#spinner").hide();
 				unsetListeners();
-				//$(element).append('hi');
+				$(element).append('hi');
 				//alert(element.attr("class"));
 				$(element).css("width","100%");
 				$(element).html(result);
 				$(element).hide();
 				$(element).slideDown();
-				scrollToElement($(element),1000,-150);
+				//scrollToElement($(element),1000,-150);
 				addButtons();
 			}
 		});
@@ -496,6 +502,46 @@ function updatePage()
 			scrollToElement($('#content'));
 		}
 	});
+}
+
+function updatePageWithModel()
+{
+	var pathname = ($(location).attr('hash')).substring(1);
+	var hashArray = pathname.split('-');
+	var request = hashArray[0];
+	var theTitle = hashArray[2];
+	var theId = hashArray[1];
+	if(request == 'todoview') 
+	{
+		var todo = findTodo(theId,home);
+		$("#content").html(makeView(todo,1));
+		unsetListeners();
+		addButtons();
+	}
+	else if(request == 'todolist') 
+	{
+		var todo = findTodo(theId,home);
+		$("#content").html(makeList(todo));
+		unsetListeners();
+		addButtons();
+	}
+	else
+	{
+		var requestLink = "http://sagegatzke.com/todosajax/redirect.php?requestedinfo=" +pathname.toLowerCase();
+		$.ajax({
+			url : requestLink,
+			beforeSend : function() {
+				$("#spinner").show();
+			},
+			success : function(result) {
+				$("#spinner").hide();
+				unsetListeners();
+				$("#content").html(result);
+				addButtons();
+				scrollToElement($('#content'));
+			}
+		});
+	}
 }
 
 function badLogin()
