@@ -436,13 +436,13 @@ function createULS($node,$firstelement,$firstId)
 /**
  * adds new todo item to db
  */
-function addNewTodoItemto($treeId,$title,$desc,$dueDate,$lastUpdated)
+function addNewTodoItemto($treeId,$title,$desc,$dueDate)
 {
 	$title = htmlentities($title);
 	$treeId = htmlentities($treeId);
 	$desc = htmlentities($desc);
 	
-	$sql1 = 'INSERT INTO `todo_list`(`id`, `title`, `parent`, `completed`, `due_date`, `last_updated`) VALUES (null,"'.$title.'",'.$treeId.',0,"'.$dueDate .'",Now()])';
+	$sql1 = 'INSERT INTO `todo_list`(`id`, `title`, `parent`, `completed`, `due_date`, `last_updated`) VALUES (null,"'.$title.'",'.$treeId.',0,"'.$dueDate .'",Now())';
 	$newTodoId;
 	$sql2 = 'INSERT INTO `todo_info`(`id`, `desc`, `todo_id`, `created_by`, `assigned_to`) VALUES (null,"'.$desc.'",LAST_INSERT_ID(),1,0)';
 	$iConn = conn('insert');  
@@ -453,12 +453,12 @@ function addNewTodoItemto($treeId,$title,$desc,$dueDate,$lastUpdated)
 		 
 		  $res = $iConn->query($sql1);
 		  if($res === false) {
-		    throw new Exception('Wrong SQL: ' . $sql1 . ' Error: ' . $iConn->error);
+		    throw new Exception('Wrong SQL1: ' . $sql1 . ' Error: ' . $iConn->error);
 		  }
 		  $newTodoId = $iConn->insert_id;
 		  $res = $iConn->query($sql2);
 		  if($res === false) {
-		    throw new Exception('Wrong SQL: ' . $sql2 . ' Error: ' . $iConn->error);
+		    throw new Exception('Wrong SQL2: ' . $sql2 . ' Error: ' . $iConn->error);
 		  }
 		 
 		  $iConn->commit();

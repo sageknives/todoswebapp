@@ -238,7 +238,7 @@ function addTodo(id)
 	var todoTitle = $("#todo-name").val();
 	var todoDesc = $("#todo-desc").val();
 	var dueDate = $("#todo-date").val() + " 12:00:00";
-	alert(dueDate);
+	
 	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?treeId=" + id + 
 	'&name=' + $("#todo-name").val() + '&info=' + $("#todo-desc").val() +  '&date=' + dueDate;
 	$.ajax({
@@ -273,7 +273,9 @@ function upDateTodoLists(parentid,id,title,desc,dueDate)
 		//$(ulId).remove();
 		var todo = findTodo(parentid,home);
 		//alert((todo.getChildren()).length);
-		todo.addChild(new Todo(id,title,desc,false,dueDate));
+		var child = new Todo(id,title,parent,false,dueDate,"0000-00-00 12:00:00");
+		child.setDesc(desc);
+		todo.addChild(child);
 		//alert((todo.getChildren()).length);
 		//alert(todo.getTitle());
 		

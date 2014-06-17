@@ -25,8 +25,9 @@
 			}
 			$todoTitle = $_REQUEST['name'];
 			$todoDesc = $_REQUEST['info'];
+			$todoDate = $_REQUEST['date'];
 			
-			$isAdded = addNewTodoItemto($treeId,$todoTitle,$todoDesc);
+			$isAdded = addNewTodoItemto($treeId,$todoTitle,$todoDesc,$todoDate);
 			return $isAdded;
 		}
 	}

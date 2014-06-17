@@ -8,12 +8,12 @@ function Model()
 	this.getHome = function()
 	{
 		return this.home;
-	}
+	};
 	this.setHome = function(node)
 	{
 		this.home = node;
 		populateHome(node);
-	}
+	};
 	this.getHomeInstance = function()
 	{
 		if(this.home == null) this.getTree();
@@ -98,6 +98,10 @@ function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
 	{
 		return this.desc;
 	};
+	this.setDesc = function(desc)
+	{
+		this.desc = desc;
+	}
 	this.addImage = function(src)
 	{
 		this.images.push(src);
@@ -249,7 +253,7 @@ function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
 		$(listItem).css("height", height);
 		unsetListeners();
 		addButtons();
-	}
+	};
 
 	//this.setDesc = function()
 }

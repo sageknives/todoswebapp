@@ -70,7 +70,7 @@ class Node implements JsonSerializable
 	private $images = array();
 	public $children = array();
 	
-	function __construct($id,$title,$parent,$isComplete,$dueDate,$lastUpdated/*,$desc,$createdBy*/)
+	function __construct($id,$title,$parent,$isComplete,$dueDate,$lastUpdated)
 	{
 		$this->id = $id;
 		$this->title = $title;
