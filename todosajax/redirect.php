@@ -15,7 +15,8 @@
 		{
 			$treeId = $_REQUEST['treeId'];
 			$completed = $_REQUEST['complete'];
-			updateTodoCompletion($treeId,$completed);
+			$lastUpdated = $_REQUEST['lastupdated'];
+			updateTodoCompletion($treeId,$completed,$lastUpdated);
 		}
 		elseif(isset($_REQUEST['name']))
 		{
@@ -26,8 +27,9 @@
 			$todoTitle = $_REQUEST['name'];
 			$todoDesc = $_REQUEST['info'];
 			$todoDate = $_REQUEST['date'];
+			$lastUpdated = $_REQUEST['lastupdated'];
 			
-			$isAdded = addNewTodoItemto($treeId,$todoTitle,$todoDesc,$todoDate);
+			$isAdded = addNewTodoItemto($treeId,$todoTitle,$todoDesc,$todoDate,$lastUpdated);
 			return $isAdded;
 		}
 	}

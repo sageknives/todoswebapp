@@ -29,7 +29,7 @@ if($loggedIn)
 	$content .= '
 <section class="col4 home-block background">
 	<h2 class="title">Todo this Week</h2>
-	<ul>
+	<ul id="this-week">
 		<li href="todoview" class="ajax-request"><a href="#todoview-mowlawn">Mow Lawn</a></li>
 		<li href="todolist" class="ajax-request"><a href="#todolist-wireframes">WireFrames</a></li>
 		<li href="todoview" class="ajax-request"><a href="#todoview-readjavachapter4">Read Java Chapter 4</a></li>

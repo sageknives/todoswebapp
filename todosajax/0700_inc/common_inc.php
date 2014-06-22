@@ -436,13 +436,13 @@ function createULS($node,$firstelement,$firstId)
 /**
  * adds new todo item to db
  */
-function addNewTodoItemto($treeId,$title,$desc,$dueDate)
+function addNewTodoItemto($treeId,$title,$desc,$dueDate,$lastUpdated)
 {
 	$title = htmlentities($title);
 	$treeId = htmlentities($treeId);
 	$desc = htmlentities($desc);
 	
-	$sql1 = 'INSERT INTO `todo_list`(`id`, `title`, `parent`, `completed`, `due_date`, `last_updated`) VALUES (null,"'.$title.'",'.$treeId.',0,"'.$dueDate .'",Now())';
+	$sql1 = 'INSERT INTO `todo_list`(`id`, `title`, `parent`, `completed`, `due_date`, `last_updated`) VALUES (null,"'.$title.'",'.$treeId.',0,"'.$dueDate .'","'.$lastUpdated.'")';
 	$newTodoId;
 	$sql2 = 'INSERT INTO `todo_info`(`id`, `desc`, `todo_id`, `created_by`, `assigned_to`) VALUES (null,"'.$desc.'",LAST_INSERT_ID(),1,0)';
 	$iConn = conn('insert');  
@@ -481,9 +481,9 @@ function addNewTodoItemto($treeId,$title,$desc,$dueDate)
 /**
  * updates database with completed or uncompleted
  */
-function updateTodoCompletion($treeId,$completed)
+function updateTodoCompletion($treeId,$completed,$lastUpdated)
 {
-	$sql1 = 'UPDATE `todo_list` SET `completed`='.$completed.', `last_updated`=Now() WHERE id = ' . $treeId;
+	$sql1 = 'UPDATE `todo_list` SET `completed`='.$completed.', `last_updated`="'.$lastUpdated.'" WHERE id = ' . $treeId;
 	$iConn = conn("insert");  
 	try {
 		  /* switch autocommit status to FALSE. Actually, it starts transaction */
@@ -554,7 +554,29 @@ function checkCred($username, $password)
 
 function checkForUpdate($id,$lastUpdate)
 {
-	return 0;
+		$id = htmlentities($id);
+	$sql = 'Select tl.id, tl.title, tl.parent, tl.completed,tl.due_date,tl.last_updated,ti.desc,ti.created_by,ti.assigned_to,img.img_src from todo_list as tl join todo_info as ti on tl.id = ti.todo_id  and tl.id ="'
+		.$id .  '" left join todo_img as img on tl.id = img.todo_id where tl.last_updated > "'.$lastUpdate.'"';
+	$iConn = conn();  
+
+	$result = mysqli_query($iConn,$sql) or die(trigger_error(mysqli_error($iConn), E_USER_ERROR));
+	$node = null;
+	if(mysqli_num_rows($result) > 0)
+	{
+		$count = 0;
+		while($row = mysqli_fetch_assoc($result))
+		{
+			if($count == 0){
+				$node = new Node($row['id'],$row['title'],$row['parent'],$row['completed'],$row['due_date'],$row['last_updated']);
+				$node->fullConstruct($row['desc'],$row['created_by'],$row['assigned_to']);
+			}
+			if($row['img_src'] != null) $node->addImage($row['img_src']);
+			
+			$count++;
+		}
+	}
+	@mysqli_free_result($result);
+	return $node;
 }
  
 /**

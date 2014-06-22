@@ -1,19 +1,48 @@
+
 /**
  * Webapp overall Model
  */
 function Model()
 {
+	this.dateTime;
 	this.home;
+	this.thisWeek = [];
 	
 	this.getHome = function()
 	{
 		return this.home;
 	};
+	this.addDueTodo = function(todo)
+	{
+		 this.thisWeek.push(todo);
+	};
+	this.getDueTodo = function()
+	{
+		 return this.thisWeek;
+	};
+	this.showDueTodos = function()
+	{
+		if(this.thisWeek.length < 1)return;
+		var listItem = '';
+		for(var i=0; i<this.thisWeek.length; i++){
+			listItem = createLiItemHome(listItem,this.thisWeek[i],this.thisWeek[i].isCompleted());
+		};
+		$("#this-week").html(listItem);
+	}
 	this.setHome = function(node)
 	{
 		this.home = node;
 		populateHome(node);
+		this.setDateTime(); 
 	};
+	this.getDateTime = function()
+	{
+		return this.dateTime;
+	}
+	this.setDateTime = function()
+	{
+		this.dateTime = new Date().toMysqlFormat();
+	}
 	this.getHomeInstance = function()
 	{
 		if(this.home == null) this.getTree();
@@ -27,7 +56,41 @@ function Model()
 			this.updateTree(children[i])
 		}
 	};
-	
+	this.refreshTree = function(todo)
+	{
+		var children = todo.getChildren();
+		for(var i=0;i<children.length;i++)
+		{
+			children[i].checkForUpdate();
+			this.refreshTree(children[i])
+		}
+	}
+	this.checkTreeForUpdates = function()
+	{
+		var model = this;
+		var requestLink = "http://sagegatzke.com/todosajax/jsdirect.php?jsrequest=getnew&jstime="+this.dateTime;
+		$.ajax({
+			url : requestLink,
+			dataType : "json",
+			async:true,
+			contentType: "application/json",
+			beforeSend : function() {
+				//$("#spinner").show();
+			},
+			success : function(result) {
+				//$("#spinner").hide();
+				var foundTodos = [];
+				foundTodos = updateNewTodos(result,model.home,foundTodos);
+				var newTodos = [];
+				for (var i=0; i < foundTodos.length; i++) 
+				{
+					if(foundTodos[i] == null) newTodos.push(result[i]);
+				}
+				addNewTodos(newTodos,model.home);
+			}
+		});
+		this.setDateTime(); 
+	}
 	this.getTree = function()
 	{
 		var model = this;
@@ -42,9 +105,11 @@ function Model()
 			},
 			success : function(result) {
 				//$("#spinner").hide();
-				//var stringify = JSON.stringify(result);
-				var todoTree = createTree(result);
-
+				var weekOut = new Date();
+				weekOut.setDate(weekOut.getDate() + 7);
+				var weekBack = new Date();
+				weekBack.setDate(weekBack.getDate() - 7);
+				var todoTree = createTree(result,weekOut,weekBack,0);
 				createULS(todoTree,"top-element",true);
 				model.setHome(todoTree);	
 			}
@@ -56,11 +121,12 @@ function Model()
 /**
  * Todo Class
  */
-function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
+function Todo(id,title,parentId,isComplete,dueDate,lastUpdated,parentNode)
 {
 	this.id = id;
 	this.title = title;
-	this.parent = parent;
+	this.parentId = parentId;
+	this.parentNode = parentNode;
 	this.isComplete = isComplete;
 	this.dueDate = dueDate;
 	this.lastUpdated = lastUpdated;
@@ -70,6 +136,12 @@ function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
 	this.images = [];
 	this.children = [];
 	
+	this.update = function(isComplete,dueDate,lastUpdated)
+	{
+		this.setCompleted(isComplete);
+		this.dueDate = dueDate;
+		this.lastUpdated = lastUpdated;
+	};
 	this.getId = function()
 	{
 		return this.id;
@@ -78,13 +150,23 @@ function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
 	{
 		return this.title;
 	};
-	this.getParent = function()
+	this.getParentId = function()
 	{
-		return this.parent;
+		return this.parentId;
+	};
+	this.getParentNode = function()
+	{
+		return this.parentNode;
 	};
 	this.isCompleted = function()
 	{
 		return this.isComplete == 1;
+	};
+	this.setCompleted = function(isDone)
+	{
+		if(isDone == this.isComplete)return;
+		this.isComplete = isDone;
+		this.updateList(parentId,id,parentNode);
 	};
 	this.getDueDate = function()
 	{
@@ -113,13 +195,14 @@ function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
 	this.addChild = function(todo)
 	{
 		this.children.push(todo);
+		if(home != null) this.updateList(this.id,todo.getId(),this);
 	};
 	this.getChildren = function()
 	{
 		var count = (this.children).length;
 		if(count > 1)
 		{
-			 this.children = this.sortByDueDate(this.children);
+			 //this.children = this.sortByDueDate(this.children);
 			 this.children = this.sortByCompleted(this.children);
 		}
 		return this.children;
@@ -131,7 +214,6 @@ function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
 		{
 			for (var j=i+1; j < list.length; j++) 
 			{ 
-				if(list[j].title == null) continue;
 				if(this.boolToNum(list[i].isCompleted()) > this.boolToNum(list[j].isCompleted()))
 				{
 					var temp = list[i];
@@ -207,7 +289,7 @@ function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
 	this.checkForUpdate = function()
 	{
 		var curTodo = this;
-		alert(curTodo.id);
+		//alert(curTodo.id);
 		var requestLink = "http://sagegatzke.com/todosajax/jsdirect.php?jsrequest=checkforupdate&todoid=" + curTodo.id+"&todolast="+curTodo.lastUpdated;
 		$.ajax({
 			url : requestLink,
@@ -218,7 +300,20 @@ function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
 				//$("#spinner").show();
 			},
 			success : function(result) {
-				if(result == null)return;
+				if(result == '')return;
+
+				curTodo.title = result.title;
+				curTodo.setCompleted(result.iscomplete);
+				curTodo.dueDate = result.duedate;
+				curTodo.lastUpdated = result.lastdpdated;
+				curTodo.desc = result.desc;
+				curTodo.createdBy = result.createdby;
+				curTodo.assignedTo = result.assignedto;
+				var imgs = result.images;
+				for(var i=0;i< imgs.length; i++){
+				  	curTodo.addImage(imgs[i]);
+				};
+				curTodo.updateList(curTodo.parentId,curTodo.id,findTodo(curTodo.parentId,model.getHome()));
 				//$("#spinner").hide();
 				//var stringify = JSON.stringify(result);
 				//var todoTree = createTree(result);
@@ -228,11 +323,15 @@ function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
 			}
 		});
 	};
-	
+
 	this.updateList = function(id,childId,node)
 	{
+		//alert("id:" + id + ",childId:" + childId + ",nodetitle:" + node.title);
 		var listItem = $('#list-' + id);
 		var height = listItem.css("height");
+		var marginLeft = listItem.css("margin-left");
+		if(marginLeft == null) marginLeft = 0;
+		//alert('margin-left:' + marginLeft + ",listItem:" + listItem);
 		if(listItem.length) 
 		{
 			listItem.remove();
@@ -242,15 +341,36 @@ function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
 			oldId = oldList.substring(5);
 			var oldListItem = $('#' + oldList);
 			oldListItem.remove();
-			var newNode = findTodo(oldId,home);
+			var newNode = findTodo(oldId,model.home);
 			createUl(newNode,"",false);
 			setMenuId("#list-" + id);
 		}
 		createUl(node,"",false);
 		listItem = $("#list-" + id);
 		$(listItem).show();
-		$(listItem).css("margin-left" ,"0");
+		$(listItem).css("margin-left" ,marginLeft);
 		$(listItem).css("height", height);
+		var children = node.getChildren();
+		var allDone = true;
+		for(var i=0;i< children.length;i++)
+		{
+			if(!children[i].isCompleted()) 
+			{
+				allDone = false;
+				break;
+			}
+		}
+		if(allDone != node.isCompleted()) {
+			updateTodoCompleted(node.getId(),allDone);
+		}
+			//doubling and not stopping at if, fix it!
+			var parentNode = node.getParentNode();
+			//alert(parentNode == '0');
+			if(parentNode != '0')
+			{
+				parentNode.updateList(parentNode.getId(),this.getId(),parentNode);
+			}
+		
 		unsetListeners();
 		addButtons();
 	};
@@ -258,6 +378,55 @@ function Todo(id,title,parent,isComplete,dueDate,lastUpdated)
 	//this.setDesc = function()
 }
 
+
+function updateNewTodos(result,node,foundTodos)
+{
+	var found= false;
+	for (var i=0; i < result.length; i++) {
+	    if(node.id == result[i].id) {
+	   		foundTodos[i] = true;
+	   		node.update(result[i].complete,result[i].duedate,result[i].lastupdated);
+	    }
+	}
+	
+	/*if(!found){
+		for (var i=0; i < result.length; i++) {
+		  	//alert(node.getParentId() + ":" + result[i].parent);
+		  	if(node.getParentId() == result[i].parent)
+		  	{
+	    	//alert("making a child");
+	    	var parent = node.getParentNode();
+	    	//id,title,parentId,isComplete,dueDate,lastUpdated,parentNode
+	    	var child = new Todo(result[i].id,result[i].title,result[i].parent,result[i].iscomplete,result[i].duedate,result[i].lastupdated,parent);
+	    	//parent.addChild(child);
+	    	parent.updateList(parent.getId(),child.getId(),parent);
+	    	}
+		};
+   
+	}*/
+	var children = node.getChildren();
+	for (var i=0; i < children.length; i++) {
+	   updateNewTodos(result,children[i],foundTodos);
+	}
+	return foundTodos;
+};
+function addNewTodos(newTodos,node){
+	for (var i=0; i < newTodos.length; i++) {
+		//alert(newTodos[i].id + ":" + node.getId());
+	    if(node.getParentId() == newTodos[i].parent) {
+	    	//alert("adding child");
+	   		var parent = node.getParentNode();
+	    	var child = new Todo(newTodos[i].id,newTodos[i].title,newTodos[i].parent,newTodos[i].iscomplete,newTodos[i].duedate,newTodos[i].lastupdated,parent);
+	    	parent.addChild(child);
+	    	parent.updateList(parent.getId(),child.getId(),parent);
+	    	newTodos[i].parent = '';
+	    }
+	}
+	var children = node.getChildren();
+	for (var i=0; i < children.length; i++) {
+	   addNewTodos(newTodos,children[i]);
+	}
+}
 /**
  * Creates a list of views
  */
@@ -281,7 +450,7 @@ function makeView(todo, stepNum)
 	if(todo != null && todo.isCompleted()) checked = "checked";
 
 	contentView += '<div id="view-' + todo.getId() +'"><h2 class="title">'+
-	stepNum+todo.getTitle()+'</h2><section class="col12 list-block background"><div class="li-obj">';
+	stepNum+". " +todo.getTitle()+'</h2><section class="col12 list-block background"><div class="li-obj">';
 
  	var images = todo.getImages();
 	if(images.length > 0)
@@ -320,10 +489,17 @@ function makeComments(todo)
 /**
  * creates the todo tree based on an ajax json response
  */
-function createTree(json)
+function createTree(json,weekOut,weekBack,parentNode)
 {
-	var item = new Todo(json.id,json.title,json.parent,json.complete,json.duedate,json.lastupdated);
-	for(var i = 0; i < (json.children).length;i++) item.addChild(createTree(json.children[i]));
+	var item = new Todo(json.id,json.title,json.parent,json.complete,json.duedate,json.lastupdated,parentNode);
+	var t = item.dueDate.split(/[- :]/);
+	var d = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
+
+	if (weekOut > d && weekBack < d && !item.isCompleted()){
+   	  var model = getModel();
+   	  model.addDueTodo(item);
+	}
+	for(var i = 0; i < (json.children).length;i++) item.addChild(createTree(json.children[i],weekOut,weekBack,item));
 	return item;
 }
 
@@ -348,7 +524,7 @@ function createUl(node,firstelement,firstId)
 	var children = node.getChildren();
 	var listItem = '';
 	var ulId = node.getId();
-	var h4Id = node.getParent();
+	var h4Id = node.getParentId();
 	if(firstId) {
 		ulId = "todo-nav";
 	}
@@ -373,21 +549,13 @@ function createUl(node,firstelement,firstId)
 					break;
 				} 
 			}
-			listItem += '<li><img class="child-status nav-image" src="images/'+completed+
-			'" /><p class="todo-navigation todo-nav-title" href="'+children[i].getId()+'">'+ childTitle +
-			 '</p><p class="atodo-nav-info"><a href="#todolist-'+children[i].getId()+"-"+children[i].getTitle() +
-			  '"><img class="child-info nav-image" src="images/view.png" /></a></p></li>';
+			listItem = createLiItemList(listItem,children[i],completed);
 		}
 		else
 		{
 			var complete = '';
 			if(children[i].isCompleted()) complete = 'checked';
-			listItem += '<li><input class="css-checkbox" type="checkbox" name="todo-item" value="'+
-				children[i].getId()+'" '+complete+'><p class="todo-nav-title">'
-				+'<a href="#todoview-'+children[i].getId()+"-"+ children[i].getTitle() + '">'+ childTitle + 
-				'</a></p><img href="'+children[i].getId()+
-				'" class="add-sub-item child-status nav-image" src="images/addsub.png" />'+
-				'<br class="clear" /></li>';
+			listItem = createLiItem(listItem,children[i],complete);
 		}
 	}
 	listItem += '</ul>';
@@ -395,6 +563,37 @@ function createUl(node,firstelement,firstId)
 	return children;
 }
 
+function createLiItemList(listItem,child,completed)
+{
+	listItem += '<li><img class="child-status nav-image" src="images/'+completed+
+			'" /><p class="todo-navigation todo-nav-title" href="'+child.getId()+'">'+ child.getTitle() +
+			 '</p><p class="atodo-nav-info"><a href="#todolist-'+child.getId()+"-"+child.getTitle() +
+			  '"><img class="child-info nav-image" src="images/view.png" /></a></p></li>';
+	return listItem;
+}
+/**
+ * create li item
+ */
+function createLiItem(listItem,child,complete)
+{
+	listItem += '<li><input class="css-checkbox" type="checkbox" name="todo-item" value="'+
+				child.getId()+'" '+complete+'><p class="todo-nav-title">'
+				+'<a href="#todoview-'+child.getId()+"-"+ child.getTitle() + '">'+ child.getTitle() + 
+				'</a></p><img href="'+child.getId()+
+				'" class="add-sub-item child-status nav-image" src="images/addsub.png" />'+
+				'<br class="clear" /></li>';
+	return listItem;
+}
+/**
+ * create li item
+ */
+function createLiItemHome(listItem,child,complete)
+{
+	listItem += '<li>'
+				+'<a href="#todoview-'+child.getId()+"-"+ child.getTitle() + '">'+ child.getTitle() + 
+				'</a></li>';
+	return listItem;
+}
 /**
  * Tests tree
  * @param {Object} item
@@ -410,3 +609,22 @@ function testTree(item,titles,indent)
 	}
 	return titles;
 }
+
+/**
+ * You first need to create a formatting function to pad numbers to two digits…
+ **/
+function twoDigits(d) {
+    if(0 <= d && d < 10) return "0" + d.toString();
+    if(-10 < d && d < 0) return "-0" + (-1*d).toString();
+    return d.toString();
+}
+
+/**
+ * …and then create the method to output the date string as desired.
+ * Some people hate using prototypes this way, but if you are going
+ * to apply this to more than one Date object, having it as a prototype
+ * makes sense.
+ **/
+Date.prototype.toMysqlFormat = function() {
+    return this.getUTCFullYear() + "-" + twoDigits(1 + this.getUTCMonth()) + "-" + twoDigits(this.getUTCDate()) + " " + twoDigits(this.getUTCHours()) + ":" + twoDigits(this.getUTCMinutes()) + ":" + twoDigits(this.getUTCSeconds());
+};

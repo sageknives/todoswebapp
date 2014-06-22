@@ -86,6 +86,29 @@ class Node implements JsonSerializable
 		$this->createdBy = $createdBy;
 		$this->assignedTo = $assignedTo;
 	}
+	public function getUpdatedTodos($dateTime,$todoList)
+	{
+		$results = '';
+		//echo $this->lastUpdated . ':'. $dateTime;
+		$thisDate = split('[ ]', $this->lastUpdated);
+		$thatDate = split('[ ]', $dateTime);
+		//echo $thisDate[0] .':'. $thatDate[0];
+		if(strtotime($thisDate[0]) - strtotime($thatDate[0]) >= 0) 
+		{
+			//if(str_replace(':', '', $thisDate[1]) - str_replace(':', '', $thatDate[1]) > 0)
+			//{
+				$results .= "1";
+				$todoList[] = $this;
+			//}
+		}
+		//echo $results; 
+		//if($this->lastUpdated > $dateTime)$todoList[] = $this;
+		$children = $this->getChildren();
+		for ($i=0; $i < count($children); $i++) { 
+			$todoList = $children[$i]->getUpdatedTodos($dateTime,$todoList);
+		}
+		return $todoList;
+	}
 	public function jsonSerialize()
     {
         return array(

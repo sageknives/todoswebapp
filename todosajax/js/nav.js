@@ -27,7 +27,8 @@ $(function() {
 	$(window).resize(function() {
 		resizeNavs();
 	})
-	
+	//var pathname = ($(location).attr('hash')).substring(1);
+	//if(pathname =='' || pathname =='home') model.showDueTodos();
 	$( "#todo-date" ).datepicker({dateFormat: 'yy-mm-dd'});
 	//log in log out function
 	$('#login-drop').click(function(e) {
@@ -129,141 +130,21 @@ function populateHome(todoTree)
 	unsetListeners();
 	addButtons();
 	model.updateTree(home);
-}
-function resizeNavs() {
 	
-	var height = $(window).height() - 50;
-	if($('#log-button').attr('id') == null || $(window).width() > 480) height += 40;
-	$('.repo-sub').each(function() {
-
-		$(this).css("height", height);
-	});
-	$('.top-nav-item').each(function() {
-		$(this).css("height", height);
-	});
-}
-
-function checkNavs(element) {
-	return element.css('marginLeft') == "0px" && element.attr("id") == "repo-nav" || element.css('marginLeft') == "0px" && element.attr("id") == "todo-nav" || element.css('marginRight') == "0px" && element.attr("id") == "log-nav" || element.css('marginRight') == "0px" && element.attr("id") == "settings-nav";
-}
-
-function checkListNav()
-{
-	var isOpen = false;
-	$(".todolistnav").each(function(){
-		if($(this).css('marginLeft') == "0px"){
-			isOpen = true;
-		}
-	})
-	return isOpen;
-}
-
-function closeSubNavs(element) {
-	$('.repo-sub').each(function() {
-		if(element.attr("class") != $(this).attr("class"))
-			$(this).animate({
-				marginLeft : '-480px'
-			});
-
-	})
-}
-function getTodoForm(todoId){
-	var addForm = $("#add-form-container");
-		var width = $(window).width();
-		var slideOut = 0;
-		var height = $(window).height() -50;
-		if(width > 768) {
-			slideOut = 305;
-			width = width - slideOut;
-		}
-		addForm.animate({
-			marginLeft: "0",
-			left: slideOut,
-			width: width,
-			height: height
-		});
-	$("#todo-status").val(todoId);
-	// this needs to populate another field so we know whether or not its this menu
-	//or a submenu, ie close parent if submenu
-	$("#todo-name").focus();
-}
-function removeTodoForm(){
-	var addForm = $("#add-form-container");
-		addForm.animate({
-			marginLeft: "-100%"
-		});
-		//clear out form
-		$("#todo-name").val('');
-		$("#todo-desc").val('');  
-}
-function closeNavs(text) {
-	closeSubNavs($('#rep-nav'));
-	if(text != 'repo-button') {
-		$('#repo-nav').animate({
-			marginLeft : '-100%'
-		});
-	}
-	if(text != 'todo-button') {
-		$('#todo-nav').animate({
-			marginLeft : '-100%'
-		});
-		$(".todolistnav").animate({
-			marginLeft : '-101%'
-		});
-	}
-	if(text != 'log-button') {
-		$('#log-nav').animate({
-			marginRight : '-100%'
-		});
-	}
-	if(text != 'settings-button') {
-		$('#settings-nav').animate({
-			marginRight : '-100%'
-		});
-	}
-
-}
-function addTodo(id)
-{
-	//alert(home.getTitle());
-	if(id == "todo-nav") id = 0;
-	if($("#todo-name").val() == '')
+	var dueTodo = model.getDueTodo();
+	for(var i = 0; i < dueTodo.length;i++)
 	{
-		$("#invalid-todo").show();
-		return;
+		//alert(dueTodo[i].title);
 	}
-	else{
-		$("#invalid-todo").hide();
-	}
-	var todoTitle = $("#todo-name").val();
-	var todoDesc = $("#todo-desc").val();
-	var dueDate = $("#todo-date").val() + " 12:00:00";
-	
-	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?treeId=" + id + 
-	'&name=' + $("#todo-name").val() + '&info=' + $("#todo-desc").val() +  '&date=' + dueDate;
-	$.ajax({
-		url : requestLink,
-		beforeSend: function(){
-                   $("#spinner").show();
-               },
-		success : function(result) {
-			$("#spinner").hide();
-			//$("#content").html(result);
-			if(result == '') {
-				alert("Shared folders not createable yet");
-				return;
-			}
-			else if(result == 0) {
-				alert("please try again");
-				return;
-			}
-			alert($("#todo-name").val() + " was successfully added");
-			upDateTodoLists(id,result,todoTitle,todoDesc,dueDate);
-			removeTodoForm();
-		}
-	});
-
+	notify();
 }
+function notify()
+{
+	//setInterval("model.refreshTree(home)",60000);
+	setInterval("model.checkTreeForUpdates()",30000);
+	
+}
+
 function upDateTodoLists(parentid,id,title,desc,dueDate)
 {
 	//alert(parentid);
@@ -273,7 +154,7 @@ function upDateTodoLists(parentid,id,title,desc,dueDate)
 		//$(ulId).remove();
 		var todo = findTodo(parentid,home);
 		//alert((todo.getChildren()).length);
-		var child = new Todo(id,title,parent,false,dueDate,"0000-00-00 12:00:00");
+		var child = new Todo(id,title,parent,false,dueDate,new Date().toMysqlFormat(),todo);
 		child.setDesc(desc);
 		todo.addChild(child);
 		//alert((todo.getChildren()).length);
@@ -284,13 +165,12 @@ function upDateTodoLists(parentid,id,title,desc,dueDate)
 		//createUl(todo,"",false);
 		//$(ulId).show();
 	} 
-	else alert(ulId +": it's null!");
-	
-	
+	else alert(ulId +": it's null!");	
 }
 
 function findTodo(id,todo)
 {
+	if(todo == null) todo = home;
 	if(todo.getId() == id){
 		//alert("Id found!");
 		return todo;
@@ -304,27 +184,28 @@ function findTodo(id,todo)
 			if(maybeTodo != null) return maybeTodo;
 		}
 		return null;
-	}
-	
+	}	
 }
 
 function updateTodoCompleted(id,isChecked){
-	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?treeId=" + id + "&complete=" + isChecked;
-		$.ajax({
-			url : requestLink,
-			beforeSend: function(){
-                       $("#spinner").show();
-                   },
-			success : function(result) {
-				$("#spinner").hide();
-				//needs to update the model and redraw
-			}
-		});
+	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?treeId=" + id + "&complete=" + isChecked + '&lastupdated=' + model.getDateTime();;
+	$.ajax({
+		url : requestLink,
+		beforeSend: function(){
+                   $("#spinner").show();
+               },
+		success : function(result) {
+			$("#spinner").hide();
+			//needs to update the model and redraw
+			var todo = findTodo(id,home);
+			todo.setCompleted(isChecked);
+		}
+	});
 }
 function addButtons()
 {
 	// ajax jquery calls
-	$(".ajax-request").click(function(e) {
+	/*$(".ajax-request").click(function(e) {
 		if($(window).width() < 768) closeNavs();
 		e.stopPropagation();
 		
@@ -338,12 +219,14 @@ function addButtons()
 				$("#spinner").hide();
 				unsetListeners();
 				$("#content").html(result);
+				var pathname = ($(location).attr('hash')).substring(1);
+				if(pathname =='' || pathname =='home') model.showDueTodos();
 				addButtons();
 				//scrollToElement($('#content'));
 			}
 		});
 	});
-	
+	*/
 
 	$(".close").click(function(e) {
 		if($(window).width() < 768) closeNavs();
@@ -384,7 +267,7 @@ function addButtons()
 		getTodoForm($(this).attr("href"));
 	});
 	
-	$(".css-checkbox").change(function(e) {
+	$(".css-checkbox").click(function(e) {
 		e.stopPropagation();
 		e.preventDefault();
 		updateTodoCompleted($(this).val(),$(this).is(":checked"));
@@ -500,10 +383,14 @@ function updatePage()
 			$("#spinner").hide();
 			unsetListeners();
 			$("#content").html(result);
+			var pathname = ($(location).attr('hash')).substring(1);
+	//alert(pathname);
+	if(pathname =='' || pathname =='home') model.showDueTodos();
 			addButtons();
 			scrollToElement($('#content'));
 		}
 	});
+	
 }
 
 function updatePageWithModel()
@@ -513,10 +400,14 @@ function updatePageWithModel()
 	var request = hashArray[0];
 	var theTitle = hashArray[2];
 	var theId = hashArray[1];
+	if($(window).width() < 768) closeNavs();
 	if(request == 'todoview') 
 	{
 		var todo = findTodo(theId,home);
 		$("#content").html(makeView(todo,1));
+		var pathname = ($(location).attr('hash')).substring(1);
+		//alert(pathname);
+		if(pathname =='' || pathname =='home') model.showDueTodos();
 		unsetListeners();
 		addButtons();
 	}
@@ -539,11 +430,15 @@ function updatePageWithModel()
 				$("#spinner").hide();
 				unsetListeners();
 				$("#content").html(result);
+				var pathname = ($(location).attr('hash')).substring(1);
+				//alert(pathname);
+				if(pathname =='' || pathname =='home') model.showDueTodos();
 				addButtons();
 				scrollToElement($('#content'));
 			}
 		});
 	}
+	
 }
 
 function badLogin()
@@ -553,11 +448,88 @@ function badLogin()
 	$("#username").focus();
 }
 
+
+
+
+
+
+function getModel()
+{
+	return model;
+}
+
+// navigation controls
 function setMenuId(id)
 {
 	currentMenuId = id;
 }
 
+function closeNavs(text) 
+{
+	closeSubNavs($('#rep-nav'));
+	if(text != 'repo-button') {
+		$('#repo-nav').animate({
+			marginLeft : '-100%'
+		});
+	}
+	if(text != 'todo-button') {
+		$('#todo-nav').animate({
+			marginLeft : '-100%'
+		});
+		$(".todolistnav").animate({
+			marginLeft : '-101%'
+		});
+	}
+	if(text != 'log-button') {
+		$('#log-nav').animate({
+			marginRight : '-100%'
+		});
+	}
+	if(text != 'settings-button') {
+		$('#settings-nav').animate({
+			marginRight : '-100%'
+		});
+	}
+}
+
+function closeSubNavs(element) 
+{
+	$('.repo-sub').each(function() {
+		if(element.attr("class") != $(this).attr("class"))
+			$(this).animate({
+				marginLeft : '-480px'
+			});
+	})
+}
+
+function checkListNav()
+{
+	var isOpen = false;
+	$(".todolistnav").each(function(){
+		if($(this).css('marginLeft') == "0px"){
+			isOpen = true;
+		}
+	})
+	return isOpen;
+}
+
+function resizeNavs() 
+{
+	
+	var height = $(window).height() - 50;
+	if($('#log-button').attr('id') == null || $(window).width() > 480) height += 40;
+	$('.repo-sub').each(function() {
+
+		$(this).css("height", height);
+	});
+	$('.top-nav-item').each(function() {
+		$(this).css("height", height);
+	});
+}
+
+function checkNavs(element) {
+	return element.css('marginLeft') == "0px" && element.attr("id") == "repo-nav" || element.css('marginLeft') == "0px" && element.attr("id") == "todo-nav" || element.css('marginRight') == "0px" && element.attr("id") == "log-nav" || element.css('marginRight') == "0px" && element.attr("id") == "settings-nav";
+}
 
 function findOpenNav()
 {
@@ -569,28 +541,78 @@ function findOpenNav()
 	})
 	return listId;
 }
-//old ajax
-/*
-function loadContent(requestedInfo, action) {
-	if(window.XMLHttpRequest) {
-		xmlhttp = new XMLHttpRequest();
-	} else {
-		xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
-	}
-	xmlhttp.onreadystatechange = function() {
-		if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-			content = xmlhttp.responseText;
-			$('#content').html(content);
-			$('#loader').hide();
-			$('#content').slideDown();
 
-		} else if(xmlhttp.status == 404) {
-			$('#content').html('Sorry, Content Not Found');
-		} else {
-			$('#loader').show();
-		}
+//add form
+function addTodo(id)
+{
+	//alert(home.getTitle());
+	if(id == "todo-nav") id = 0;
+	if($("#todo-name").val() == '')
+	{
+		$("#invalid-todo").show();
+		return;
 	}
-	xmlhttp.open('POST', 'http://sagegatzke.com/todosajax/redirect.php?requestedinfo=' + requestedInfo + '&t=' + d.getTime(), action);
-	xmlhttp.send();
-};
-*/
+	else{
+		$("#invalid-todo").hide();
+	}
+	var todoTitle = $("#todo-name").val();
+	var todoDesc = $("#todo-desc").val();
+	var dueDate = $("#todo-date").val() + " 12:00:00";
+	
+	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?treeId=" + id + 
+	'&name=' + $("#todo-name").val() + '&info=' + $("#todo-desc").val() +  '&date=' + dueDate + '&lastupdated=' + model.getDateTime();
+	$.ajax({
+		url : requestLink,
+		beforeSend: function(){
+                   $("#spinner").show();
+               },
+		success : function(result) {
+			$("#spinner").hide();
+			//$("#content").html(result);
+			if(result == '') {
+				alert("Shared folders not createable yet");
+				return;
+			}
+			else if(result == 0) {
+				alert("please try again");
+				return;
+			}
+			alert($("#todo-name").val() + " was successfully added");
+			upDateTodoLists(id,result,todoTitle,todoDesc,dueDate);
+			removeTodoForm();
+		}
+	});
+
+}
+
+function removeTodoForm(){
+	var addForm = $("#add-form-container");
+		addForm.animate({
+			marginLeft: "-100%"
+		});
+		//clear out form
+		$("#todo-name").val('');
+		$("#todo-desc").val('');  
+		$("#todo-date").val(''); 
+}
+
+function getTodoForm(todoId){
+	var addForm = $("#add-form-container");
+		var width = $(window).width();
+		var slideOut = 0;
+		var height = $(window).height() -50;
+		if(width > 768) {
+			slideOut = 305;
+			width = width - slideOut;
+		}
+		addForm.animate({
+			marginLeft: "0",
+			left: slideOut,
+			width: width,
+			height: height
+		});
+	$("#todo-status").val(todoId);
+	// this needs to populate another field so we know whether or not its this menu
+	//or a submenu, ie close parent if submenu
+	$("#todo-name").focus();
+}

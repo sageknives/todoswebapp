@@ -12,7 +12,7 @@ if (isset($_REQUEST['jsrequest'])) {
 
 	if ($_REQUEST['jsrequest'] == "getall") {
 		$treeId = $_SESSION['treeid'];
-		$homedir = new Node("1","home","0","0","00-00-0000","00-00-0000");
+		$homedir = new Node("1","home","0","0","0000-00-00 00:00:00","0000-00-00 00:00:00");
 		for ($i = 0; $i < count($treeId); $i++) {
 			//echo $treeId[$i];
 			$homedir->addChild(createSQL($treeId[$i], 8));
@@ -21,12 +21,36 @@ if (isset($_REQUEST['jsrequest'])) {
 		$encodedModel = json_encode($homedir->toArray());
 		echo $encodedModel;
 	}
+	else if($_REQUEST['jsrequest'] == "getnew") {
+		$lastTimeStamp = $_REQUEST['jstime'];
+		$treeId = $_SESSION['treeid'];
+		$homedir = new Node("1","home","0","0","0000-00-00 00:00:00","0000-00-00 00:00:00");
+		for ($i = 0; $i < count($treeId); $i++) {
+			$homedir->addChild(createSQL($treeId[$i], 8));
+		}
+		
+		$updatedTodos = $homedir->getUpdatedTodos($lastTimeStamp,array());
+		//var_dump($updatedTodos);
+		if($updatedTodos == null) echo 'is not working';
+		else
+		{
+			header('Content-Type: application/json');
+			$encodedModel = json_encode($updatedTodos);
+			echo $encodedModel;
+		}
+	}
 	else if($_REQUEST['jsrequest'] == "checkforupdate")
 	{
 		$todoId = $_REQUEST['todoid'];
 		$todoLast = $_REQUEST['todolast'];
 		$update = checkForUpdate($todoId,$todoLast);
-		echo $update;
+		if($update == null) echo 'is null';
+		else
+		{
+			header('Content-Type: application/json');
+			$encodedTodo = json_encode($update->toArray());
+			echo $encodedTodo;
+		}
 	}
 	else if($_REQUEST['jsrequest'] == "getextra")
 	{
