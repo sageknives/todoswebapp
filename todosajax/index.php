@@ -54,11 +54,5 @@ include 'header.php';
 <div id="spinner" class="hidden"><img src="images/spinner6.gif"></div>
 <div id="content" class="onepcssgrid-1200">
 </div>
-<script>
-	<?php 
-	
-		//echo 'alert("Session"' . $_SESSION['status'] .');'; 
-		?>
-</script>
 
 <footer id="main-footer"></footer>

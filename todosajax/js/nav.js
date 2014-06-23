@@ -127,43 +127,25 @@ $(function() {
 function populateHome(todoTree)
 {
 	home = todoTree;
-	unsetListeners();
-	addButtons();
+	resetListeners();
 	model.updateTree(home);
-	
-	var dueTodo = model.getDueTodo();
-	for(var i = 0; i < dueTodo.length;i++)
-	{
-		//alert(dueTodo[i].title);
-	}
 	notify();
 }
 function notify()
 {
-	//setInterval("model.refreshTree(home)",60000);
-	setInterval("model.checkTreeForUpdates()",30000);
-	
+	setInterval("model.checkTreeForUpdates()",30000);	
 }
 
 function upDateTodoLists(parentid,id,title,desc,dueDate)
 {
-	//alert(parentid);
 	ulId = "#list-" + parentid;
 	if($(ulId) != null){
-		//alert(ulId +": not null!");
-		//$(ulId).remove();
 		var todo = findTodo(parentid,home);
-		//alert((todo.getChildren()).length);
 		var child = new Todo(id,title,parent,false,dueDate,new Date().toMysqlFormat(),todo);
 		child.setDesc(desc);
 		todo.addChild(child);
-		//alert((todo.getChildren()).length);
-		//alert(todo.getTitle());
-		
 		todo.updateList(parentid,id, todo);
-		//alert("list updated");
-		//createUl(todo,"",false);
-		//$(ulId).show();
+		resetListeners();
 	} 
 	else alert(ulId +": it's null!");	
 }
@@ -191,43 +173,17 @@ function updateTodoCompleted(id,isChecked){
 	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?treeId=" + id + "&complete=" + isChecked + '&lastupdated=' + model.getDateTime();;
 	$.ajax({
 		url : requestLink,
-		beforeSend: function(){
-                   $("#spinner").show();
-               },
 		success : function(result) {
-			$("#spinner").hide();
-			//needs to update the model and redraw
 			var todo = findTodo(id,home);
 			todo.setCompleted(isChecked);
+			if(!todo.isCompleted()) model.addDueTodo(todo);
+			else remove(model.getDueTodo(),todo);
+			model.showDueTodos();
 		}
 	});
 }
 function addButtons()
 {
-	// ajax jquery calls
-	/*$(".ajax-request").click(function(e) {
-		if($(window).width() < 768) closeNavs();
-		e.stopPropagation();
-		
-		var requestLink = "http://sagegatzke.com/todosajax/redirect.php?requestedinfo=" + $(this).attr("href").toLowerCase();
-		$.ajax({
-			url : requestLink,
-			beforeSend: function(){
-                       $("#spinner").show();
-                   },
-			success : function(result) {
-				$("#spinner").hide();
-				unsetListeners();
-				$("#content").html(result);
-				var pathname = ($(location).attr('hash')).substring(1);
-				if(pathname =='' || pathname =='home') model.showDueTodos();
-				addButtons();
-				//scrollToElement($('#content'));
-			}
-		});
-	});
-	*/
-
 	$(".close").click(function(e) {
 		if($(window).width() < 768) closeNavs();
 		e.stopPropagation();
@@ -269,8 +225,10 @@ function addButtons()
 	
 	$(".css-checkbox").click(function(e) {
 		e.stopPropagation();
-		e.preventDefault();
 		updateTodoCompleted($(this).val(),$(this).is(":checked"));
+	});
+	$(".css-checkbox").change(function(e) {
+		e.stopPropagation();
 	});
 	
 	$(".add-sub-item").click(function(e){
@@ -290,8 +248,7 @@ function addButtons()
 	})
 	$('#add-button').click(function(e) {
 		e.preventDefault();
-		addTodo($("#todo-status").val());
-		
+		addTodo($("#todo-status").val());		
 	});
 	$('#cancel-button').click(function(e) {
 		e.preventDefault();
@@ -358,6 +315,7 @@ function unsetListeners()
 	$(".todolistnav li").unbind('click');
 	$(".add-sub-item").unbind('click');
 	$(".css-checkbox").unbind('click');
+	$(".css-checkbox").unbind('change');
 	$(".add-item").unbind('click');
 }
 function scrollToElement(selector, time, verticalOffset) {
@@ -381,12 +339,10 @@ function updatePage()
 		},
 		success : function(result) {
 			$("#spinner").hide();
-			unsetListeners();
 			$("#content").html(result);
 			var pathname = ($(location).attr('hash')).substring(1);
-	//alert(pathname);
-	if(pathname =='' || pathname =='home') model.showDueTodos();
-			addButtons();
+			if(pathname =='' || pathname =='home') model.showDueTodos();
+			resetListeners();
 			scrollToElement($('#content'));
 		}
 	});
@@ -406,17 +362,14 @@ function updatePageWithModel()
 		var todo = findTodo(theId,home);
 		$("#content").html(makeView(todo,1));
 		var pathname = ($(location).attr('hash')).substring(1);
-		//alert(pathname);
 		if(pathname =='' || pathname =='home') model.showDueTodos();
-		unsetListeners();
-		addButtons();
+		resetListeners();
 	}
 	else if(request == 'todolist') 
 	{
 		var todo = findTodo(theId,home);
 		$("#content").html(makeList(todo));
-		unsetListeners();
-		addButtons();
+		resetListeners();
 	}
 	else
 	{
@@ -428,12 +381,10 @@ function updatePageWithModel()
 			},
 			success : function(result) {
 				$("#spinner").hide();
-				unsetListeners();
 				$("#content").html(result);
 				var pathname = ($(location).attr('hash')).substring(1);
-				//alert(pathname);
 				if(pathname =='' || pathname =='home') model.showDueTodos();
-				addButtons();
+				resetListeners();
 				scrollToElement($('#content'));
 			}
 		});
@@ -447,11 +398,6 @@ function badLogin()
 	$("#invalid-login").show();
 	$("#username").focus();
 }
-
-
-
-
-
 
 function getModel()
 {
@@ -566,7 +512,8 @@ function addTodo(id)
 		beforeSend: function(){
                    $("#spinner").show();
                },
-		success : function(result) {
+		success : function(result) 
+		{
 			$("#spinner").hide();
 			//$("#content").html(result);
 			if(result == '') {
@@ -598,19 +545,19 @@ function removeTodoForm(){
 
 function getTodoForm(todoId){
 	var addForm = $("#add-form-container");
-		var width = $(window).width();
-		var slideOut = 0;
-		var height = $(window).height() -50;
-		if(width > 768) {
-			slideOut = 305;
-			width = width - slideOut;
-		}
-		addForm.animate({
-			marginLeft: "0",
-			left: slideOut,
-			width: width,
-			height: height
-		});
+	var width = $(window).width();
+	var slideOut = 0;
+	var height = $(window).height() -50;
+	if(width > 768) {
+		slideOut = 305;
+		width = width - slideOut;
+	}
+	addForm.animate({
+		marginLeft: "0",
+		left: slideOut,
+		width: width,
+		height: height
+	});
 	$("#todo-status").val(todoId);
 	// this needs to populate another field so we know whether or not its this menu
 	//or a submenu, ie close parent if submenu

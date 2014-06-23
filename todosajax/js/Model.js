@@ -14,7 +14,16 @@ function Model()
 	};
 	this.addDueTodo = function(todo)
 	{
-		 this.thisWeek.push(todo);
+		var weekOut = new Date();
+		weekOut.setDate(weekOut.getDate() + 7);
+		var weekBack = new Date();
+		weekBack.setDate(weekBack.getDate() - 7);
+		var t = todo.dueDate.split(/[- :]/);
+		var d = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
+
+		if (weekOut > d && weekBack < d){
+		this.thisWeek.push(todo);
+		}
 	};
 	this.getDueTodo = function()
 	{
@@ -74,11 +83,7 @@ function Model()
 			dataType : "json",
 			async:true,
 			contentType: "application/json",
-			beforeSend : function() {
-				//$("#spinner").show();
-			},
 			success : function(result) {
-				//$("#spinner").hide();
 				var foundTodos = [];
 				foundTodos = updateNewTodos(result,model.home,foundTodos);
 				var newTodos = [];
@@ -105,11 +110,7 @@ function Model()
 			},
 			success : function(result) {
 				//$("#spinner").hide();
-				var weekOut = new Date();
-				weekOut.setDate(weekOut.getDate() + 7);
-				var weekBack = new Date();
-				weekBack.setDate(weekBack.getDate() - 7);
-				var todoTree = createTree(result,weekOut,weekBack,0);
+				var todoTree = createTree(result,model,0);
 				createULS(todoTree,"top-element",true);
 				model.setHome(todoTree);	
 			}
@@ -202,7 +203,7 @@ function Todo(id,title,parentId,isComplete,dueDate,lastUpdated,parentNode)
 		var count = (this.children).length;
 		if(count > 1)
 		{
-			 //this.children = this.sortByDueDate(this.children);
+			 this.children = this.sortByDueDate(this.children);
 			 this.children = this.sortByCompleted(this.children);
 		}
 		return this.children;
@@ -260,12 +261,8 @@ function Todo(id,title,parentId,isComplete,dueDate,lastUpdated,parentNode)
 			dataType : "json",
 			async:true,
 			contentType: "application/json",
-			beforeSend : function() {
-				//$("#spinner").show();
-			},
 			success : function(result) {
 				if(result == null)return;
-				//alert(curTodo.id);
 				curTodo.desc = result.desc;
 				curTodo.createdBy = result.createdby;
 				curTodo.assignedTo = result.assignedto;
@@ -273,65 +270,21 @@ function Todo(id,title,parentId,isComplete,dueDate,lastUpdated,parentNode)
 				for(var i=0;i< imgs.length; i++){
 				  	curTodo.addImage(imgs[i]);
 				};
-				//curTodo.images = result.images;
-				//alert(curTodo.desc);
-				//$("#spinner").hide();
-				//var stringify = JSON.stringify(result);
-				//alert(stringify);
-				//var todoTree = createTree(result);
-
-				//createULS(todoTree,"top-element",true);
-				//model.setHome(todoTree);	
 			}
 		});
 	};
 	
-	this.checkForUpdate = function()
-	{
-		var curTodo = this;
-		//alert(curTodo.id);
-		var requestLink = "http://sagegatzke.com/todosajax/jsdirect.php?jsrequest=checkforupdate&todoid=" + curTodo.id+"&todolast="+curTodo.lastUpdated;
-		$.ajax({
-			url : requestLink,
-			dataType : "json",
-			async:true,
-			contentType: "application/json",
-			beforeSend : function() {
-				//$("#spinner").show();
-			},
-			success : function(result) {
-				if(result == '')return;
-
-				curTodo.title = result.title;
-				curTodo.setCompleted(result.iscomplete);
-				curTodo.dueDate = result.duedate;
-				curTodo.lastUpdated = result.lastdpdated;
-				curTodo.desc = result.desc;
-				curTodo.createdBy = result.createdby;
-				curTodo.assignedTo = result.assignedto;
-				var imgs = result.images;
-				for(var i=0;i< imgs.length; i++){
-				  	curTodo.addImage(imgs[i]);
-				};
-				curTodo.updateList(curTodo.parentId,curTodo.id,findTodo(curTodo.parentId,model.getHome()));
-				//$("#spinner").hide();
-				//var stringify = JSON.stringify(result);
-				//var todoTree = createTree(result);
-				
-				//createULS(todoTree,"top-element",true);
-				//model.setHome(todoTree);	
-			}
-		});
-	};
-
 	this.updateList = function(id,childId,node)
 	{
-		//alert("id:" + id + ",childId:" + childId + ",nodetitle:" + node.title);
+		var atTop = false;
+		if(id == 1) {
+			id = 'todo-nav';
+			atTop = true;
+		}
 		var listItem = $('#list-' + id);
 		var height = listItem.css("height");
 		var marginLeft = listItem.css("margin-left");
 		if(marginLeft == null) marginLeft = 0;
-		//alert('margin-left:' + marginLeft + ",listItem:" + listItem);
 		if(listItem.length) 
 		{
 			listItem.remove();
@@ -345,7 +298,7 @@ function Todo(id,title,parentId,isComplete,dueDate,lastUpdated,parentNode)
 			createUl(newNode,"",false);
 			setMenuId("#list-" + id);
 		}
-		createUl(node,"",false);
+		createUl(node,"",atTop);
 		listItem = $("#list-" + id);
 		$(listItem).show();
 		$(listItem).css("margin-left" ,marginLeft);
@@ -363,21 +316,21 @@ function Todo(id,title,parentId,isComplete,dueDate,lastUpdated,parentNode)
 		if(allDone != node.isCompleted()) {
 			updateTodoCompleted(node.getId(),allDone);
 		}
-			//doubling and not stopping at if, fix it!
-			var parentNode = node.getParentNode();
-			//alert(parentNode == '0');
-			if(parentNode != '0')
-			{
-				parentNode.updateList(parentNode.getId(),this.getId(),parentNode);
-			}
+		var parentNode = node.getParentNode();
+		if(parentNode != '0')
+		{
+			parentNode.updateList(parentNode.getId(),this.getId(),parentNode);
+		}
 		
-		unsetListeners();
-		addButtons();
+		resetListeners();
 	};
-
-	//this.setDesc = function()
 }
 
+function resetListeners()
+{
+	unsetListeners();
+	addButtons();
+}
 
 function updateNewTodos(result,node,foundTodos)
 {
@@ -412,9 +365,7 @@ function updateNewTodos(result,node,foundTodos)
 };
 function addNewTodos(newTodos,node){
 	for (var i=0; i < newTodos.length; i++) {
-		//alert(newTodos[i].id + ":" + node.getId());
 	    if(node.getParentId() == newTodos[i].parent) {
-	    	//alert("adding child");
 	   		var parent = node.getParentNode();
 	    	var child = new Todo(newTodos[i].id,newTodos[i].title,newTodos[i].parent,newTodos[i].iscomplete,newTodos[i].duedate,newTodos[i].lastupdated,parent);
 	    	parent.addChild(child);
@@ -489,17 +440,12 @@ function makeComments(todo)
 /**
  * creates the todo tree based on an ajax json response
  */
-function createTree(json,weekOut,weekBack,parentNode)
+function createTree(json,model,parentNode)
 {
 	var item = new Todo(json.id,json.title,json.parent,json.complete,json.duedate,json.lastupdated,parentNode);
-	var t = item.dueDate.split(/[- :]/);
-	var d = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
-
-	if (weekOut > d && weekBack < d && !item.isCompleted()){
-   	  var model = getModel();
-   	  model.addDueTodo(item);
-	}
-	for(var i = 0; i < (json.children).length;i++) item.addChild(createTree(json.children[i],weekOut,weekBack,item));
+	if(!item.isCompleted()) model.addDueTodo(item);
+	
+	for(var i = 0; i < (json.children).length;i++) item.addChild(createTree(json.children[i],model,item));
 	return item;
 }
 
@@ -610,6 +556,9 @@ function testTree(item,titles,indent)
 	return titles;
 }
 
+function remove(arr, item) {
+	for(var i = arr.length; i--;) if(arr[i] === item) arr.splice(i, 1); 
+}
 /**
  * You first need to create a formatting function to pad numbers to two digits…
  **/

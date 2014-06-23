@@ -30,14 +30,8 @@ if($loggedIn)
 <section class="col4 home-block background">
 	<h2 class="title">Todo this Week</h2>
 	<ul id="this-week">
-		<li href="todoview" class="ajax-request"><a href="#todoview-mowlawn">Mow Lawn</a></li>
-		<li href="todolist" class="ajax-request"><a href="#todolist-wireframes">WireFrames</a></li>
-		<li href="todoview" class="ajax-request"><a href="#todoview-readjavachapter4">Read Java Chapter 4</a></li>
-		<li href="todoview" class="ajax-request"><a href="#todoview-readjavachapter5">Read Java Chapter 5</a></li>
-		<li href="todoview" class="ajax-request"><a href="#todoview-readjavachapter6">Read Java Chapter 6</a></li>
-		<li href="todoview" class="ajax-request"><a href="#todoview-dopractiveandroidchapter1">do Practive android chapter 1</a></li>
-		<li href="todolist" class="ajax-request"><a href="#todolist-introtoandroiddebugging">Intro to Android Debugging</a></li>
-	</ul>
+		<li>all caught up!</li>
+			</ul>
 </section>';
 }
 else

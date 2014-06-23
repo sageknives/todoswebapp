@@ -14,7 +14,6 @@ if (isset($_REQUEST['jsrequest'])) {
 		$treeId = $_SESSION['treeid'];
 		$homedir = new Node("1","home","0","0","0000-00-00 00:00:00","0000-00-00 00:00:00");
 		for ($i = 0; $i < count($treeId); $i++) {
-			//echo $treeId[$i];
 			$homedir->addChild(createSQL($treeId[$i], 8));
 		}
 		header('Content-Type: application/json');
@@ -30,7 +29,6 @@ if (isset($_REQUEST['jsrequest'])) {
 		}
 		
 		$updatedTodos = $homedir->getUpdatedTodos($lastTimeStamp,array());
-		//var_dump($updatedTodos);
 		if($updatedTodos == null) echo 'is not working';
 		else
 		{

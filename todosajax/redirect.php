@@ -50,5 +50,4 @@
 		else if($request == 'comments') include 'comments.php';
 		else echo 'Error, not found<br>requestedInfo:'.$requestInfo.'<br>request:'.$request.'<br>theTitle:'.$theTitle.'<br>theId:'.$theId;
 	}
-	//echo '<script>alert(' .$_REQUEST['hash'] . ');';
 ?>

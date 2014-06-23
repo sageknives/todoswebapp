@@ -39,36 +39,13 @@ function getSqlData($sql,$model)
 			}
 			
 		}
-		//sorts nodes
-		/*for ($i=0; $i < count($model)-1; $i++) 
-		{
-			for ($j=$i+1; $j < count($model) ; $j++) 
-			{ 
-				if($model[$i]->getParent() > $model[$j]->getParent())
-				{
-					$temp = $model[$i]->getCopy();
-					$model[$i] =$model[$j]->getCopy();
-					$model[$j] = $temp->getCopy();
-				}
-			}
-		}*/
+
 		$root = $model[0]->getCopy();
-		//$awesome = makeTree($model,$root);
 		$homedir = makeTree($model,$root);
-		//testTree($awesome,'');
-		//echo '<nav class="todome"><ul id="todo-new">';
-		//createUL($awesome);
-		//echo '</ul></nav>';
-		//$homedir = new Node(1,"home",0,0);
-		//$homedir->addChild($awesome);
-		//echo '<nav class="todome">';
-		//createULS($homedir,"top-element",true);
-		//echo '</nav>';
 	}	
 	@mysqli_free_result($result);
 	return $homedir;
 }
-
 
 function createSQL($value, $depth)
 {
@@ -105,7 +82,6 @@ function getModelSqlData($sql,$model)
 		$model = array();
 		while($row = mysqli_fetch_assoc($result))
 		{
-		 
 			//only gets one version of each node
 			for ($i=0; $i < count($row); $i++) 
 			{ 
@@ -129,31 +105,6 @@ function getModelSqlData($sql,$model)
 			}
 			
 		}
-		//sorts nodes
-		/*for ($i=0; $i < count($model)-1; $i++) 
-		{
-			for ($j=$i+1; $j < count($model) ; $j++) 
-			{ 
-				if($model[$i]->getParent() > $model[$j]->getParent())
-				{
-					$temp = $model[$i]->getCopy();
-					$model[$i] =$model[$j]->getCopy();
-					$model[$j] = $temp->getCopy();
-				}
-			}
-		}*/
-		//$root = $model[0]->getCopy();
-		//$awesome = makeTree($model,$root);
-		//$homedir = makeTree($model,$root);
-		//testTree($awesome,'');
-		//echo '<nav class="todome"><ul id="todo-new">';
-		//createUL($awesome);
-		//echo '</ul></nav>';
-		//$homedir = new Node(1,"home",0,0);
-		//$homedir->addChild($awesome);
-		//echo '<nav class="todome">';
-		//createULS($homedir,"top-element",true);
-		//echo '</nav>';
 	}	
 	@mysqli_free_result($result);
 	return $model;
@@ -197,11 +148,8 @@ function getIdFromTitle($title)
 			$id = $row['id'];
 		}
 	}
-
-	//var_dump($parent);
 	@mysqli_free_result($result);
 	return $id;
-
 }
 
 function getListInfo($id)
@@ -238,8 +186,6 @@ where tl.parent = "'.$id.'" or tl.id = "'.$id.'" order by tl.id asc';
 			}
 		}
 	}
-
-	//var_dump($parent);
 	@mysqli_free_result($result);
 	return $parent;
 }
@@ -430,7 +376,6 @@ function createULS($node,$firstelement,$firstId)
 		}
 		
 	}
-	//echo '</li>';
 }
 
 /**
@@ -462,7 +407,6 @@ function addNewTodoItemto($treeId,$title,$desc,$dueDate,$lastUpdated)
 		  }
 		 
 		  $iConn->commit();
-		  //echo 'Transaction completed successfully!';
 		  echo $newTodoId;
 		 
 		} catch (Exception $e) {
@@ -493,7 +437,6 @@ function updateTodoCompletion($treeId,$completed,$lastUpdated)
 		  if($res === false) {
 		    throw new Exception('Wrong SQL: ' . $sql1 . ' Error: ' . $iConn->error);
 		  }
-		 //echo 'updated';
 		  $iConn->commit();
 		 
 		} catch (Exception $e) {

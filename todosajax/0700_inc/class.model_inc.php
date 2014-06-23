@@ -1,61 +1,6 @@
 <?php
 //database objects
 
-class nav {
-	private $sectionTitle;
-	private $sectionImg;
-	private $courseName;
-	private $courseFolder;
-	
-	
-	function __construct($sectionTitle,$sectionImg, $courseName, $coursefolder)
-	{
-		$this->sectionTitle = $sectionTitle;
-		$this->sectionImg = $sectionImg;
-		$this->courseName = $courseName;
-		$this->courseFolder = $coursefolder;
-	}
-	
-	function getTitle()
-	{
-		return $this->sectionTitle;
-	}
-	function getImg()
-	{
-		return $this->sectionImg;
-	}
-	function getNumSubs()
-	{
-		return count($this->courseName);
-	}
-	function getSubTitle($position)
-	{
-		return $this->courseName[$position];
-	}
-	function getfolder($position)
-	{
-		return $this->courseFolder[$position];
-	}
-}
-
-class container{
-	protected $items = array();
-	
-	function __contruct()
-	{
-		
-	}
-	
-	function getItems()
-	{
-		return $this->items;
-	}
-	
-	function addItem($values)
-	{
-		$this->items[] = $values;
-	}
-}
 class Node implements JsonSerializable
 {
 	public $id;
@@ -89,20 +34,17 @@ class Node implements JsonSerializable
 	public function getUpdatedTodos($dateTime,$todoList)
 	{
 		$results = '';
-		//echo $this->lastUpdated . ':'. $dateTime;
 		$thisDate = split('[ ]', $this->lastUpdated);
 		$thatDate = split('[ ]', $dateTime);
-		//echo $thisDate[0] .':'. $thatDate[0];
 		if(strtotime($thisDate[0]) - strtotime($thatDate[0]) >= 0) 
 		{
-			//if(str_replace(':', '', $thisDate[1]) - str_replace(':', '', $thatDate[1]) > 0)
-			//{
+			$diff = strtotime($thisDate[1]) - strtotime($thatDate[1]);
+			if($diff+60 > 0)
+			{
 				$results .= "1";
 				$todoList[] = $this;
-			//}
+			}
 		}
-		//echo $results; 
-		//if($this->lastUpdated > $dateTime)$todoList[] = $this;
 		$children = $this->getChildren();
 		for ($i=0; $i < count($children); $i++) { 
 			$todoList = $children[$i]->getUpdatedTodos($dateTime,$todoList);
@@ -255,8 +197,7 @@ class Node implements JsonSerializable
 	    }
 	
 	    return $data;
-	}
-	
+	}	
 }
 
 class View
@@ -331,49 +272,3 @@ class View
 	}
 	
 }
-/*class Node
-{
-	private $children;
-	
-    function __construct()
-    {
-        $children = array();
-    }
-
-	function getName(){
-		return $this->name;
-	}
-	function setName($name){
-		$this->name = $name;
-	}
-	function getChildren()
-	{
-		return $this->children;
-	}
-	function setChildren($children)
-	{
-		$this->children =$children;
-	}
-}
-
-/*class resources extends container
-{
-	function __construct()
-	{
-		
-	}	
-	function addItem($name,$source)
-	{
-		$items[] = array($name,$source);
-	}
-	
-}
-
-class person extends container
-{	
-	function addItem($values)
-	{
-		$items[] = $values;
-	}
-	
-}*/

@@ -26,7 +26,6 @@
 <script>
 
 $(function() {
-//var noRequest = false;
 if(<?php echo $noRequest; ?>== 1) 
 {
 	updatePage();
