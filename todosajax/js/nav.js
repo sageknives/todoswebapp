@@ -1,112 +1,64 @@
-var xmlhttp;
-var content;
-var d = new Date();
-var currentMenuId = '';
-var model = new Model();
-model.getHomeInstance();
-var home;
-
-//var model;
-
-if(window.XMLHttpRequest) {
-	xmlhttp = new XMLHttpRequest();
-} else {
-	xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
-}
-
 $(function() {
-	$(document).click(function() {
-		closeNavs();
-		//show hide comments
-	
-	})
-	$(window).on('popstate', function() {
-      //updatePage();
-      updatePageWithModel();
-    });
-	$(window).resize(function() {
-		resizeNavs();
-	})
-	//var pathname = ($(location).attr('hash')).substring(1);
-	//if(pathname =='' || pathname =='home') model.showDueTodos();
-	$( "#todo-date" ).datepicker({dateFormat: 'yy-mm-dd'});
+	$(document).click(function() {closeNavs();});
+	$(window).on('popstate',function() {updatePageWithModel();});
+	$(window).resize(function() {resizeNavs();});
+	$("#todo-date").datepicker({dateFormat : 'yy-mm-dd'});
 	//log in log out function
 	$('#login-drop').click(function(e) {
-		//e.stopPropagation();
-		
-		if($('#login-menu').css('marginRight') == '-260px'){
-			$("#login-menu").animate({
-				marginRight : '0'
-			});
+		if ($('#login-menu').css('marginRight') == '-260px') 
+		{
+			$("#login-menu").animate({marginRight : '0'});
 			$("#username").focus();
-			
-		}else {
-			$("#login-menu").animate({
-				marginRight : '-260px'
-			});
-		}
-		
+		} 
+		else $("#login-menu").animate({marginRight : '-260px'});
 	});
-	$('#login-button').click(function() {
-		$("#login-form").submit();
-	})
-	$('#logout-button').click(function() {
-		$("#logout-form").submit();
-	})
-	$('.top-nav-link').click(function(e) {
+	$('#login-button').click(function() {$("#login-form").submit();});
+	$('#logout-button').click(function() {$("#logout-form").submit();});
+	$('.top-nav-link').click(function(e) 
+	{
 		e.stopPropagation();
-		
 		closeNavs($(this).css("id"));
 		var element = $(this).next();
 		var height = $(window).height() - 90;
-		if($('#log-button').attr('id') == null || $(window).width() > 480) height += 40;
+		if ($('#log-button').attr('id') == null || $(window).width() > 480) height += 40;
 		element.css("height", height);
-		if(checkNavs(element) || checkListNav() && $(this).attr('id') == 'todo-button')
+		if (checkNavs(element) || checkListNav() && $(this).attr('id') == 'todo-button') closeNavs();
+		else 
 		{
-			closeNavs();			
-		}	
-		else
-		{
-			if($(this).attr('id') == 'repo-button' ||$(this).attr('id') == 'todo-button' && currentMenuId == '')
+			if ($(this).attr('id') == 'repo-button' || $(this).attr('id') == 'todo-button' && currentMenuId == '') 
 			{
 				checkListNav();
-				$(this).next().animate({
-					marginLeft : '0'
-				}, 200, "easeOutQuint");
-			}
-			else if($(this).attr('id') == 'todo-button')
-			{
+				$(this).next().animate({marginLeft : '0'}, 200, "easeOutQuint");
+			} else if ($(this).attr('id') == 'todo-button') {
 				// gets the previous spot the todolist was open to on reopen
 				checkListNav();
 				$(currentMenuId).show();
 				$(currentMenuId).animate({
-					marginLeft: "0",
-					height: height
+					marginLeft : "0",
+					height : height
 				}, 200, "easeOutQuint");
-			}
-			else{
+			} else {
 				$(this).next().animate({
 					marginRight : '0'
 				}, 200, "easeOutQuint");
 			}
 		}
-			
-
-	})
+	});
 	$('.repo-icon').click(function(e) {
 		e.stopPropagation();
 		var element = $(this).next();
 		closeSubNavs(element);
-		if(element.css('marginLeft') == '102px')
+		if (element.css('marginLeft') == '102px')
 			element.animate({
 				marginLeft : '-480px',
 				zIndex : '-1'
 			});
 		else {
 			var height = $(window).height() - 90;
-			if($('#log-button').attr('id') == null || $(window).width() > 480) height += 40;
+			if ($('#log-button').attr('id') == null || $(window).width() > 480)
+				height += 40;
 			var width = $(window).width();
-			if(width < 480) {
+			if (width < 480) {
 				width -= 100;
 				element.css("width", width);
 			}
@@ -116,192 +68,112 @@ $(function() {
 				marginLeft : '102px'
 			});
 		}
-
-	})
+	});
 	$('.repo-sub').click(function(e) {
 		e.stopPropagation();
-	})
+	});
 });
 
 //once todo tree has been populated it sets the variable and unsets all listeners and adds all new buttons for new content
-function populateHome(todoTree)
-{
-	home = todoTree;
-	resetListeners();
-	model.updateTree(home);
-	notify();
-}
-function notify()
-{
-	setInterval("model.checkTreeForUpdates()",30000);	
-}
-
-function upDateTodoLists(parentid,id,title,desc,dueDate)
-{
-	ulId = "#list-" + parentid;
-	if($(ulId) != null){
-		var todo = findTodo(parentid,home);
-		var child = new Todo(id,title,parent,false,dueDate,new Date().toMysqlFormat(),todo);
-		child.setDesc(desc);
-		todo.addChild(child);
-		todo.updateList(parentid,id, todo);
-		resetListeners();
-	} 
-	else alert(ulId +": it's null!");	
-}
-
-function findTodo(id,todo)
-{
-	if(todo == null) todo = home;
-	if(todo.getId() == id){
-		//alert("Id found!");
-		return todo;
-	}
-	else
-	{
-		var children = todo.getChildren();
-		for(var i=0;i<children.length;i++)
-		{
-			var maybeTodo = findTodo(id,children[i]);
-			if(maybeTodo != null) return maybeTodo;
-		}
-		return null;
-	}	
-}
-
-function updateTodoCompleted(id,isChecked){
-	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?treeId=" + id + "&complete=" + isChecked + '&lastupdated=' + model.getDateTime();;
-	$.ajax({
-		url : requestLink,
-		success : function(result) {
-			var todo = findTodo(id,home);
-			todo.setCompleted(isChecked);
-			if(!todo.isCompleted()) model.addDueTodo(todo);
-			else remove(model.getDueTodo(),todo);
-			model.showDueTodos();
-		}
-	});
-}
-function addButtons()
-{
+function addButtons() {
 	$(".close").click(function(e) {
-		if($(window).width() < 768) closeNavs();
+		if ($(window).width() < 768)
+			closeNavs();
 		e.stopPropagation();
 		e.stop
 		$(this).parent().parent().slideUp();
-		
 	});
-	
+
 	$(".show-info").click(function(e) {
-		if($(window).width() < 768) closeNavs();
+		if ($(window).width() < 768)
+			closeNavs();
 		e.stopPropagation();
-		var element = '#count' + $(this).attr('id');
-		var requestLink = "http://sagegatzke.com/todosajax/redirect.php?requestedinfo=" + $(this).attr("href").toLowerCase();
-		$.ajax({
-			type: "POST",
-			url : requestLink,
-			beforeSend: function(){
-                       $("#spinner").show();
-                   },
-			success : function(result) {
-				$("#spinner").hide();
-				unsetListeners();
-				$(element).append('hi');
-				//alert(element.attr("class"));
-				$(element).css("width","100%");
-				$(element).html(result);
-				$(element).hide();
-				$(element).slideDown();
-				//scrollToElement($(element),1000,-150);
-				addButtons();
-			}
-		});
+		showComments('#count' + $(this).attr('id'), $(this).attr("href").toLowerCase());
 	});
-	
-	$(".add-item").click(function(e){
+
+	$(".add-item").click(function(e) {
 		e.stopPropagation();
 		getTodoForm($(this).attr("href"));
 	});
-	
+
 	$(".css-checkbox").click(function(e) {
 		e.stopPropagation();
-		updateTodoCompleted($(this).val(),$(this).is(":checked"));
+		updateTodoCompleted($(this).val(), $(this).is(":checked"));
 	});
 	$(".css-checkbox").change(function(e) {
 		e.stopPropagation();
 	});
-	
-	$(".add-sub-item").click(function(e){
+
+	$(".add-sub-item").click(function(e) {
 		e.stopPropagation();
 		getTodoForm($(this).attr("href"));
 	});
-	
+
 	//stops the nav from closing when ul is accidentally clicked
-	$(".todolistnav").click(function(e){
+	$(".todolistnav").click(function(e) {
 		e.stopPropagation();
 	})
-	$(".todolistnav li").click(function(e){
+	$(".todolistnav li").click(function(e) {
 		e.stopPropagation();
 	})
-	$("#add-form-container").click(function(e){
+	$("#add-form-container").click(function(e) {
 		e.stopPropagation();
 	})
 	$('#add-button').click(function(e) {
 		e.preventDefault();
-		addTodo($("#todo-status").val());		
+		addTodo($("#todo-status").val());
 	});
 	$('#cancel-button').click(function(e) {
 		e.preventDefault();
 		removeTodoForm();
-		
+
 	});
-	$(".browse-button").click(function(e){
+	$(".browse-button").click(function(e) {
 		e.preventDefault();
 		alert("upload not available yet");
 	})
-	
-	$(".todo-navigation").click(function(e){
+
+	$(".todo-navigation").click(function(e) {
 		e.stopPropagation();
-		if($("#list-" + $(this).attr("href"))==null) return;
-		if($(this).attr("href").substr(0,1) =='x') {
+		if ($("#list-" + $(this).attr("href")) == null)
+			return;
+		if ($(this).attr("href").substr(0, 1) == 'x') {
 			//this is a leaf, no children,will return info on todo item to content
 			return;
 		}
 		$(this).parent().parent().animate({
-			marginLeft: "-101%",
-			height: height
+			marginLeft : "-101%",
+			height : height
 		});
 		var height = $(window).height();
 		var id = "#list-" + $(this).attr("href");
 		setMenuId(id);
 		$(id).show();
 		$(id).animate({
-			marginLeft: "0",
-			height: height
+			marginLeft : "0",
+			height : height
 		});
-		
+
 	})
-	$('.back-navigation').click(function(e){
+	$('.back-navigation').click(function(e) {
 		e.stopPropagation();
-		if($(this).attr("href") =='0') {
+		if ($(this).attr("href") == '0') {
 			closeNavs();
 			return;
 		}
-		
+
 		$(this).parent().animate({
-			marginLeft: "-101%"
+			marginLeft : "-101%"
 		});
 		var id = "#list-" + $(this).attr("href");
 		setMenuId(id);
 		$(id).animate({
-			marginLeft: "0"
+			marginLeft : "0"
 		});
 	})
 }
 
-
-function unsetListeners()
-{
+function unsetListeners() {
 	$(".ajax-request").unbind('click');
 	$(".show-info").unbind('click');
 	$(".close").unbind('click');
@@ -318,107 +190,32 @@ function unsetListeners()
 	$(".css-checkbox").unbind('change');
 	$(".add-item").unbind('click');
 }
+
 function scrollToElement(selector, time, verticalOffset) {
-    time = typeof(time) != 'undefined' ? time : 200;
-    verticalOffset = typeof(verticalOffset) != 'undefined' ? verticalOffset : 0;
-    element = $(selector);
-    offset = element.offset();
-    offsetTop = offset + verticalOffset;
-    $('html, body').animate({
-        scrollTop: offsetTop
-    }, time);
-}
-function updatePage()
-{
-	var pathname = ($(location).attr('hash')).substring(1);
-	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?requestedinfo=" +pathname.toLowerCase();
-	$.ajax({
-		url : requestLink,
-		beforeSend : function() {
-			$("#spinner").show();
-		},
-		success : function(result) {
-			$("#spinner").hide();
-			$("#content").html(result);
-			var pathname = ($(location).attr('hash')).substring(1);
-			if(pathname =='' || pathname =='home') model.showDueTodos();
-			resetListeners();
-			scrollToElement($('#content'));
-		}
-	});
-	
+	time = typeof (time) != 'undefined' ? time : 200;
+	verticalOffset = typeof (verticalOffset) != 'undefined' ? verticalOffset : 0;
+	element = $(selector);
+	offset = element.offset();
+	offsetTop = offset + verticalOffset;
+	$('html, body').animate({
+		scrollTop : offsetTop
+	}, time);
 }
 
-function updatePageWithModel()
-{
-	var pathname = ($(location).attr('hash')).substring(1);
-	var hashArray = pathname.split('-');
-	var request = hashArray[0];
-	var theTitle = hashArray[2];
-	var theId = hashArray[1];
-	if($(window).width() < 768) closeNavs();
-	if(request == 'todoview') 
-	{
-		var todo = findTodo(theId,home);
-		$("#content").html(makeView(todo,1));
-		var pathname = ($(location).attr('hash')).substring(1);
-		if(pathname =='' || pathname =='home') model.showDueTodos();
-		resetListeners();
-	}
-	else if(request == 'todolist') 
-	{
-		var todo = findTodo(theId,home);
-		$("#content").html(makeList(todo));
-		resetListeners();
-	}
-	else
-	{
-		var requestLink = "http://sagegatzke.com/todosajax/redirect.php?requestedinfo=" +pathname.toLowerCase();
-		$.ajax({
-			url : requestLink,
-			beforeSend : function() {
-				$("#spinner").show();
-			},
-			success : function(result) {
-				$("#spinner").hide();
-				$("#content").html(result);
-				var pathname = ($(location).attr('hash')).substring(1);
-				if(pathname =='' || pathname =='home') model.showDueTodos();
-				resetListeners();
-				scrollToElement($('#content'));
-			}
-		});
-	}
-	
-}
-
-function badLogin()
-{
+function badLogin() {
 	$("#login-menu").css("margin-right", "0");
 	$("#invalid-login").show();
 	$("#username").focus();
 }
 
-function getModel()
-{
-	return model;
-}
-
-// navigation controls
-function setMenuId(id)
-{
-	currentMenuId = id;
-}
-
-function closeNavs(text) 
-{
+function closeNavs(text) {
 	closeSubNavs($('#rep-nav'));
-	if(text != 'repo-button') {
+	if (text != 'repo-button') {
 		$('#repo-nav').animate({
 			marginLeft : '-100%'
 		});
 	}
-	if(text != 'todo-button') {
+	if (text != 'todo-button') {
 		$('#todo-nav').animate({
 			marginLeft : '-100%'
 		});
@@ -426,44 +223,41 @@ function closeNavs(text)
 			marginLeft : '-101%'
 		});
 	}
-	if(text != 'log-button') {
+	if (text != 'log-button') {
 		$('#log-nav').animate({
 			marginRight : '-100%'
 		});
 	}
-	if(text != 'settings-button') {
+	if (text != 'settings-button') {
 		$('#settings-nav').animate({
 			marginRight : '-100%'
 		});
 	}
 }
 
-function closeSubNavs(element) 
-{
+function closeSubNavs(element) {
 	$('.repo-sub').each(function() {
-		if(element.attr("class") != $(this).attr("class"))
+		if (element.attr("class") != $(this).attr("class"))
 			$(this).animate({
 				marginLeft : '-480px'
 			});
 	})
 }
 
-function checkListNav()
-{
+function checkListNav() {
 	var isOpen = false;
-	$(".todolistnav").each(function(){
-		if($(this).css('marginLeft') == "0px"){
+	$(".todolistnav").each(function() {
+		if ($(this).css('marginLeft') == "0px") {
 			isOpen = true;
 		}
 	})
 	return isOpen;
 }
 
-function resizeNavs() 
-{
-	
+function resizeNavs() {
 	var height = $(window).height() - 50;
-	if($('#log-button').attr('id') == null || $(window).width() > 480) height += 40;
+	if ($('#log-button').attr('id') == null || $(window).width() > 480)
+		height += 40;
 	$('.repo-sub').each(function() {
 
 		$(this).css("height", height);
@@ -477,89 +271,42 @@ function checkNavs(element) {
 	return element.css('marginLeft') == "0px" && element.attr("id") == "repo-nav" || element.css('marginLeft') == "0px" && element.attr("id") == "todo-nav" || element.css('marginRight') == "0px" && element.attr("id") == "log-nav" || element.css('marginRight') == "0px" && element.attr("id") == "settings-nav";
 }
 
-function findOpenNav()
-{
-	var listId ='';
-	$(".todolistnav").each(function(){
-		if($(this).css('marginLeft') == "0px"){
+function findOpenNav() {
+	var listId = '';
+	$(".todolistnav").each(function() {
+		if ($(this).css('marginLeft') == "0px") {
 			listId = $(this).attr("id");
 		}
 	})
 	return listId;
 }
 
-//add form
-function addTodo(id)
-{
-	//alert(home.getTitle());
-	if(id == "todo-nav") id = 0;
-	if($("#todo-name").val() == '')
-	{
-		$("#invalid-todo").show();
-		return;
-	}
-	else{
-		$("#invalid-todo").hide();
-	}
-	var todoTitle = $("#todo-name").val();
-	var todoDesc = $("#todo-desc").val();
-	var dueDate = $("#todo-date").val() + " 12:00:00";
-	
-	var requestLink = "http://sagegatzke.com/todosajax/redirect.php?treeId=" + id + 
-	'&name=' + $("#todo-name").val() + '&info=' + $("#todo-desc").val() +  '&date=' + dueDate + '&lastupdated=' + model.getDateTime();
-	$.ajax({
-		url : requestLink,
-		beforeSend: function(){
-                   $("#spinner").show();
-               },
-		success : function(result) 
-		{
-			$("#spinner").hide();
-			//$("#content").html(result);
-			if(result == '') {
-				alert("Shared folders not createable yet");
-				return;
-			}
-			else if(result == 0) {
-				alert("please try again");
-				return;
-			}
-			alert($("#todo-name").val() + " was successfully added");
-			upDateTodoLists(id,result,todoTitle,todoDesc,dueDate);
-			removeTodoForm();
-		}
-	});
-
-}
-
-function removeTodoForm(){
+function removeTodoForm() {
 	var addForm = $("#add-form-container");
-		addForm.animate({
-			marginLeft: "-100%"
-		});
-		//clear out form
-		$("#todo-name").val('');
-		$("#todo-desc").val('');  
-		$("#todo-date").val(''); 
+	addForm.animate({
+		marginLeft : "-100%"
+	});
+	//clear out form
+	$("#todo-name").val('');
+	$("#todo-desc").val('');
+	$("#todo-date").val('');
 }
 
-function getTodoForm(todoId){
+function getTodoForm(todoId) {
 	var addForm = $("#add-form-container");
 	var width = $(window).width();
 	var slideOut = 0;
-	var height = $(window).height() -50;
-	if(width > 768) {
+	var height = $(window).height() - 50;
+	if (width > 768) {
 		slideOut = 305;
 		width = width - slideOut;
 	}
 	addForm.animate({
-		marginLeft: "0",
-		left: slideOut,
-		width: width,
-		height: height
+		marginLeft : "0",
+		left : slideOut,
+		width : width,
+		height : height
 	});
 	$("#todo-status").val(todoId);
-	// this needs to populate another field so we know whether or not its this menu
-	//or a submenu, ie close parent if submenu
 	$("#todo-name").focus();
 }

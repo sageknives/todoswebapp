@@ -155,8 +155,8 @@ function getIdFromTitle($title)
 function getListInfo($id)
 {
 	$id = htmlentities($id);
-	$sql = 'Select tl.id, tl.title, tl.parent, tl.completed,ti.desc, img.img_src from todo_list as tl 
-join todo_info as ti on tl.id = ti.todo_id 
+	$sql = 'Select tl.id, tl.title, tl.parent, tl.completed,tl.last_updated,ti.desc, img.img_src from todo_list as tl 
+left join todo_info as ti on tl.id = ti.todo_id 
 left join todo_img as img on tl.id = img.todo_id 
 where tl.parent = "'.$id.'" or tl.id = "'.$id.'" order by tl.id asc';
 	$iConn = conn();  
@@ -170,7 +170,7 @@ where tl.parent = "'.$id.'" or tl.id = "'.$id.'" order by tl.id asc';
 		while($row = mysqli_fetch_assoc($result))
 		{
 			if($parent == null){
-				$parent = new View($row['id'],$row['title'],$row['parent'],$row['completed'],$row['desc']);
+				$parent = new View($row['id'],$row['title'],$row['parent'],$row['completed'],$row['desc'],$row['last_updated']);
 				if($row['img_src'] != null) $parent->addImage($row['img_src']);
 				$currentId = $row['id'];
 			}
@@ -179,7 +179,7 @@ where tl.parent = "'.$id.'" or tl.id = "'.$id.'" order by tl.id asc';
 				else $view->addImage($row['img_src']);
 			}
 			else{
-				$view = new View($row['id'],$row['title'],$row['parent'],$row['completed'],$row['desc']);
+				$view = new View($row['id'],$row['title'],$row['parent'],$row['completed'],$row['desc'],$row['last_updated']);
 				if($row['img_src'] != null) $view->addImage($row['img_src']);
 				$currentId = $row['id'];
 				$parent->addChild($view);
@@ -498,7 +498,7 @@ function checkCred($username, $password)
 function checkForUpdate($id,$lastUpdate)
 {
 		$id = htmlentities($id);
-	$sql = 'Select tl.id, tl.title, tl.parent, tl.completed,tl.due_date,tl.last_updated,ti.desc,ti.created_by,ti.assigned_to,img.img_src from todo_list as tl join todo_info as ti on tl.id = ti.todo_id  and tl.id ="'
+	$sql = 'Select tl.id, tl.title, tl.parent, tl.completed,tl.due_date,tl.last_updated,ti.desc,ti.created_by,ti.assigned_to,img.img_src from todo_list as tl left join todo_info as ti on tl.id = ti.todo_id  and tl.id ="'
 		.$id .  '" left join todo_img as img on tl.id = img.todo_id where tl.last_updated > "'.$lastUpdate.'"';
 	$iConn = conn();  
 

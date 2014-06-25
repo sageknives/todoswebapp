@@ -20,8 +20,10 @@
 <script src="js/jquery-1.11.0.min.js"></script>
 <script src="js/jquery-ui-1.10.4.custom.min.js"></script>
 <script src="js/sjcl.js"></script>
-<!--<script src="js/ajax.js"></script>-->
 <script src="js/Model.js"></script>
+<script src="js/draw.js"></script>
+<script src="js/controller.js"></script>
+<script src="js/commons.js"></script>
 <script src="js/nav.js"></script>
 <script>
 

@@ -35,12 +35,14 @@
 	}
 	else
 	{
-		$requestInfo = $_REQUEST['requestedinfo'];
-		$requestArray = split('-',$requestInfo);
-		$request = $requestArray[0];
-		$theTitle = $requestArray[2];
-		$theId = $requestArray[1];
-		
+		$request = $_REQUEST['requestedinfo'];
+		if (strpos($request, '-') !== FALSE)
+		{
+			$requestArray = split('-',$request);
+			$request = $requestArray[0];
+			$theTitle = $requestArray[2];
+			$theId = $requestArray[1];
+		}
 		if($request == 'repolist') include 'repo-list.php';
 		else if($request == 'home' || $request == '' || !$loggedIn) include 'home.php';
 		else if($request == 'settings') include 'settings.php';
@@ -48,6 +50,6 @@
 		else if($request == 'todolist') include 'todo-list.php';
 		else if($request == 'repolist') include 'repo-list.php';
 		else if($request == 'comments') include 'comments.php';
-		else echo 'Error, not found<br>requestedInfo:'.$requestInfo.'<br>request:'.$request.'<br>theTitle:'.$theTitle.'<br>theId:'.$theId;
+		else echo 'Error, not found<br>requestedInfo:'.$request.'<br>request:'.$request.'<br>theTitle:'.$theTitle.'<br>theId:'.$theId;
 	}
 ?>
