@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Name>TodoWebApp</Name>
+    <ProjectGuid>{9246961e-7430-4e18-85d8-b804783220dc}</ProjectGuid>
+    <RootNamespace>TodoWebApp</RootNamespace>
+    <OutputType>Library</OutputType>
+    <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
+    <IISProjectUrl>http://localhost:60935/</IISProjectUrl>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <IncludeDebugInformation>true</IncludeDebugInformation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <IncludeDebugInformation>false</IncludeDebugInformation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="todosajax\0700_inc\class.model_inc.php" />
+    <Compile Include="todosajax\0700_inc\common_inc.php" />
+    <Compile Include="todosajax\0700_inc\conn_inc.php" />
+    <Compile Include="todosajax\0700_inc\model_inc.php" />
+    <Compile Include="todosajax\0700_inc\unused_common.php" />
+    <Compile Include="todosajax\css\dark-hive\images\animated-overlay.gif" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-bg_flat_30_cccccc_40x100.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-bg_flat_50_5c5c5c_40x100.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-bg_glass_40_ffc73d_1x400.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-bg_highlight-hard_20_0972a5_1x100.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-bg_highlight-soft_33_003147_1x100.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-bg_highlight-soft_35_222222_1x100.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-bg_highlight-soft_44_444444_1x100.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-bg_highlight-soft_80_eeeeee_1x100.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-bg_loop_25_000000_21x21.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-icons_222222_256x240.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-icons_4b8e0b_256x240.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-icons_a83300_256x240.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-icons_cccccc_256x240.png" />
+    <Compile Include="todosajax\css\dark-hive\images\ui-icons_ffffff_256x240.png" />
+    <Compile Include="todosajax\css\dark-hive\jquery-ui-1.10.4.custom.css" />
+    <Compile Include="todosajax\css\dark-hive\jquery-ui-1.10.4.custom.min.css" />
+    <Compile Include="todosajax\css\ui-lightness\images\animated-overlay.gif" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-bg_flat_10_000000_40x100.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-bg_glass_100_f6f6f6_1x400.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-bg_glass_100_fdf5ce_1x400.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-icons_222222_256x240.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-icons_228ef1_256x240.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-icons_ef8c08_256x240.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-icons_ffd27a_256x240.png" />
+    <Compile Include="todosajax\css\ui-lightness\images\ui-icons_ffffff_256x240.png" />
+    <Compile Include="todosajax\css\ui-lightness\jquery-ui-1.10.4.custom.css" />
+    <Compile Include="todosajax\css\ui-lightness\jquery-ui-1.10.4.custom.min.css" />
+    <Compile Include="todosajax\css\nav.css" />
+    <Compile Include="todosajax\css\onepcssgrid.css" />
+    <Compile Include="todosajax\css\styles.css" />
+    <Compile Include="todosajax\images\add.png" />
+    <Compile Include="todosajax\images\addsub.png" />
+    <Compile Include="todosajax\images\amazon.png" />
+    <Compile Include="todosajax\images\android.png" />
+    <Compile Include="todosajax\images\blank.gif" />
+    <Compile Include="todosajax\images\checked.png" />
+    <Compile Include="todosajax\images\home.png" />
+    <Compile Include="todosajax\images\php.png" />
+    <Compile Include="todosajax\images\placeholder.png" />
+    <Compile Include="todosajax\images\sage.png" />
+    <Compile Include="todosajax\images\settings-icon.png" />
+    <Compile Include="todosajax\images\spinner.gif" />
+    <Compile Include="todosajax\images\spinner2.gif" />
+    <Compile Include="todosajax\images\spinner3.gif" />
+    <Compile Include="todosajax\images\spinner4.gif" />
+    <Compile Include="todosajax\images\spinner5.gif" />
+    <Compile Include="todosajax\images\spinner6.gif" />
+    <Compile Include="todosajax\images\view.png" />
+    <Compile Include="todosajax\images\wanderful.png" />
+    <Compile Include="todosajax\js\ajax.js" />
+    <Compile Include="todosajax\js\commons.js" />
+    <Compile Include="todosajax\js\controller.js" />
+    <Compile Include="todosajax\js\draw.js" />
+    <Compile Include="todosajax\js\jquery-1.11.0.min.js" />
+    <Compile Include="todosajax\js\jquery-ui-1.10.4.custom.min.js" />
+    <Compile Include="todosajax\js\Model.js" />
+    <Compile Include="todosajax\js\nav.js" />
+    <Compile Include="todosajax\js\sjcl.js" />
+    <Compile Include="todosajax\.project" />
+    <Compile Include="todosajax\blah.php" />
+    <Compile Include="todosajax\comments.php" />
+    <Compile Include="todosajax\error_log" />
+    <Compile Include="todosajax\header.php" />
+    <Compile Include="todosajax\home.php" />
+    <Compile Include="todosajax\index.php" />
+    <Compile Include="todosajax\jsdirect.php" />
+    <Compile Include="todosajax\nav.php" />
+    <Compile Include="todosajax\redirect.php" />
+    <Compile Include="todosajax\repo-list.php" />
+    <Compile Include="todosajax\settings.php" />
+    <Compile Include="todosajax\testdbo.php" />
+    <Compile Include="todosajax\todo-list.php" />
+    <Compile Include="todosajax\todo-view-template.php" />
+    <Compile Include="todosajax\todo-view.php" />
+    <Compile Include=".gitattributes" />
+    <Compile Include=".gitignore" />
+    <Compile Include=".project" />
+    <Compile Include="README.md" />
+    <Compile Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="todosajax\0700_inc" />
+    <Folder Include="todosajax\css\dark-hive\images" />
+    <Folder Include="todosajax\css\dark-hive" />
+    <Folder Include="todosajax\css\ui-lightness\images" />
+    <Folder Include="todosajax\css\ui-lightness" />
+    <Folder Include="todosajax\css" />
+    <Folder Include="todosajax\images" />
+    <Folder Include="todosajax\js" />
+    <Folder Include="todosajax" />
+  </ItemGroup>
+</Project>

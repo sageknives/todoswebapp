@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Name>TodoAjaxWeb</Name>
+    <ProjectGuid>{71751535-286a-4d31-ba4e-9cfadb7e3bf5}</ProjectGuid>
+    <RootNamespace>TodoAjaxWeb</RootNamespace>
+    <OutputType>Library</OutputType>
+    <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
+    <IISProjectUrl>http://localhost:21692/</IISProjectUrl>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <IncludeDebugInformation>true</IncludeDebugInformation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <IncludeDebugInformation>false</IncludeDebugInformation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="0700_inc\class.model_inc.php" />
+    <Compile Include="0700_inc\common_inc.php" />
+    <Compile Include="0700_inc\conn_inc.php" />
+    <Compile Include="0700_inc\model_inc.php" />
+    <Compile Include="0700_inc\unused_common.php" />
+    <Compile Include="css\dark-hive\images\animated-overlay.gif" />
+    <Compile Include="css\dark-hive\images\ui-bg_flat_30_cccccc_40x100.png" />
+    <Compile Include="css\dark-hive\images\ui-bg_flat_50_5c5c5c_40x100.png" />
+    <Compile Include="css\dark-hive\images\ui-bg_glass_40_ffc73d_1x400.png" />
+    <Compile Include="css\dark-hive\images\ui-bg_highlight-hard_20_0972a5_1x100.png" />
+    <Compile Include="css\dark-hive\images\ui-bg_highlight-soft_33_003147_1x100.png" />
+    <Compile Include="css\dark-hive\images\ui-bg_highlight-soft_35_222222_1x100.png" />
+    <Compile Include="css\dark-hive\images\ui-bg_highlight-soft_44_444444_1x100.png" />
+    <Compile Include="css\dark-hive\images\ui-bg_highlight-soft_80_eeeeee_1x100.png" />
+    <Compile Include="css\dark-hive\images\ui-bg_loop_25_000000_21x21.png" />
+    <Compile Include="css\dark-hive\images\ui-icons_222222_256x240.png" />
+    <Compile Include="css\dark-hive\images\ui-icons_4b8e0b_256x240.png" />
+    <Compile Include="css\dark-hive\images\ui-icons_a83300_256x240.png" />
+    <Compile Include="css\dark-hive\images\ui-icons_cccccc_256x240.png" />
+    <Compile Include="css\dark-hive\images\ui-icons_ffffff_256x240.png" />
+    <Compile Include="css\dark-hive\jquery-ui-1.10.4.custom.css" />
+    <Compile Include="css\dark-hive\jquery-ui-1.10.4.custom.min.css" />
+    <Compile Include="css\ui-lightness\images\animated-overlay.gif" />
+    <Compile Include="css\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
+    <Compile Include="css\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
+    <Compile Include="css\ui-lightness\images\ui-bg_flat_10_000000_40x100.png" />
+    <Compile Include="css\ui-lightness\images\ui-bg_glass_100_f6f6f6_1x400.png" />
+    <Compile Include="css\ui-lightness\images\ui-bg_glass_100_fdf5ce_1x400.png" />
+    <Compile Include="css\ui-lightness\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Compile Include="css\ui-lightness\images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
+    <Compile Include="css\ui-lightness\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
+    <Compile Include="css\ui-lightness\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
+    <Compile Include="css\ui-lightness\images\ui-icons_222222_256x240.png" />
+    <Compile Include="css\ui-lightness\images\ui-icons_228ef1_256x240.png" />
+    <Compile Include="css\ui-lightness\images\ui-icons_ef8c08_256x240.png" />
+    <Compile Include="css\ui-lightness\images\ui-icons_ffd27a_256x240.png" />
+    <Compile Include="css\ui-lightness\images\ui-icons_ffffff_256x240.png" />
+    <Compile Include="css\ui-lightness\jquery-ui-1.10.4.custom.css" />
+    <Compile Include="css\ui-lightness\jquery-ui-1.10.4.custom.min.css" />
+    <Compile Include="css\nav.css" />
+    <Compile Include="css\onepcssgrid.css" />
+    <Compile Include="css\styles.css" />
+    <Compile Include="images\add.png" />
+    <Compile Include="images\addsub.png" />
+    <Compile Include="images\amazon.png" />
+    <Compile Include="images\android.png" />
+    <Compile Include="images\blank.gif" />
+    <Compile Include="images\checked.png" />
+    <Compile Include="images\home.png" />
+    <Compile Include="images\php.png" />
+    <Compile Include="images\placeholder.png" />
+    <Compile Include="images\sage.png" />
+    <Compile Include="images\settings-icon.png" />
+    <Compile Include="images\spinner.gif" />
+    <Compile Include="images\spinner2.gif" />
+    <Compile Include="images\spinner3.gif" />
+    <Compile Include="images\spinner4.gif" />
+    <Compile Include="images\spinner5.gif" />
+    <Compile Include="images\spinner6.gif" />
+    <Compile Include="images\view.png" />
+    <Compile Include="images\wanderful.png" />
+    <Compile Include="js\ajax.js" />
+    <Compile Include="js\commons.js" />
+    <Compile Include="js\controller.js" />
+    <Compile Include="js\draw.js" />
+    <Compile Include="js\jquery-1.11.0.min.js" />
+    <Compile Include="js\jquery-ui-1.10.4.custom.min.js" />
+    <Compile Include="js\Model.js" />
+    <Compile Include="js\nav.js" />
+    <Compile Include="js\sjcl.js" />
+    <Compile Include=".project" />
+    <Compile Include="blah.php" />
+    <Compile Include="comments.php" />
+    <Compile Include="error_log" />
+    <Compile Include="header.php" />
+    <Compile Include="home.php" />
+    <Compile Include="index.php" />
+    <Compile Include="jsdirect.php" />
+    <Compile Include="nav.php" />
+    <Compile Include="redirect.php" />
+    <Compile Include="repo-list.php" />
+    <Compile Include="settings.php" />
+    <Compile Include="testdbo.php" />
+    <Compile Include="todo-list.php" />
+    <Compile Include="todo-view-template.php" />
+    <Compile Include="todo-view.php" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="0700_inc" />
+    <Folder Include="css\dark-hive\images" />
+    <Folder Include="css\dark-hive" />
+    <Folder Include="css\ui-lightness\images" />
+    <Folder Include="css\ui-lightness" />
+    <Folder Include="css" />
+    <Folder Include="images" />
+    <Folder Include="js" />
+  </ItemGroup>
+</Project>
